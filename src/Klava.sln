@@ -5,6 +5,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Klava.DataSeeder", "Klava.DataSeeder\Klava.DataSeeder.csproj", "{2946FCCC-345F-441B-89C6-5B1AB526DB2A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{D53CFAFE-A5DE-41A4-A2CF-A02A3ECEC7D5}"
+	ProjectSection(SolutionItems) = preProject
+		sql\klava_database.sql = sql\klava_database.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
