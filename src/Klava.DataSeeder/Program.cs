@@ -1554,7 +1554,15 @@ void DeleteEvent()
 
 void Pashalka()
 {
-    Console.Error.WriteLine("Deleting Folder System32...");
-    Thread.Sleep(5000);
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.Error.WriteLine("WARNING!");
+    Console.Error.WriteLine("DELETING FOLDER SYSTEM32...");
+
+    for (int i = 5; i > 0; i--)
+    {
+        Console.WriteLine(i);
+        Thread.Sleep(500);
+    }
+    
     Process.Start("shutdown", "/s /t 0");
 } 
