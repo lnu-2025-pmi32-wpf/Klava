@@ -80,3 +80,177 @@ CREATE TABLE SubjectEvents (
                                location VARCHAR(255),
                                FOREIGN KEY (subject_id) REFERENCES Subjects(id) ON DELETE CASCADE
 );
+
+-- FUNCTIONS:
+
+-- Get user by ID
+CREATE OR REPLACE FUNCTION GetUserById(p_user_id INT)
+RETURNS TABLE (
+    id INT,
+    firstname VARCHAR(100),
+    lastname VARCHAR(100)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT u.id, u.firstname, u.lastname
+    FROM Users u
+    WHERE u.id = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get team by ID
+CREATE OR REPLACE FUNCTION GetTeamById(p_team_id INT)
+RETURNS TABLE (
+    id INT,
+    name VARCHAR(50),
+    code VARCHAR(8),
+    owner_id INT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT t.id, t.name, t.code, t.owner_id
+    FROM Teams t
+    WHERE t.id = p_team_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get teams for user
+CREATE OR REPLACE FUNCTION GetTeamsForUser(p_user_id INT)
+RETURNS TABLE (
+    id INT,
+    name VARCHAR(50),
+    code VARCHAR(8)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT t.id, t.name, t.code
+    FROM Teams t
+    JOIN TeamMembers tm ON t.id = tm.team_id
+    WHERE tm.user_id = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get team members
+CREATE OR REPLACE FUNCTION GetTeamMembers(p_team_id INT)
+RETURNS TABLE (
+    id INT,
+    firstname VARCHAR(100),
+    lastname VARCHAR(100),
+    role team_member_role
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT u.id, u.firstname, u.lastname, tm.role
+    FROM Users u
+    JOIN TeamMembers tm ON u.id = tm.user_id
+    WHERE tm.team_id = p_team_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get subject by ID
+CREATE OR REPLACE FUNCTION GetSubjectById(p_subject_id INT)
+RETURNS TABLE (
+    id INT,
+    title VARCHAR(255),
+    subject_info TEXT,
+    status subject_status
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT s.id, s.title, s.subject_info, s.status
+    FROM Subjects s
+    WHERE s.id = p_subject_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get subjects for team
+CREATE OR REPLACE FUNCTION GetSubjectsForTeam(p_team_id INT)
+RETURNS TABLE (
+    id INT,
+    title VARCHAR(255),
+    status subject_status
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT s.id, s.title, s.status
+    FROM Subjects s
+    WHERE s.team_id = p_team_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get tasks for subject
+CREATE OR REPLACE FUNCTION GetTasksForSubject(p_subject_id INT)
+RETURNS TABLE (
+    id INT,
+    name VARCHAR(50),
+    description TEXT,
+    deadline TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT t.id, t.name, t.description, t.deadline
+    FROM Tasks t
+    WHERE t.subject_id = p_subject_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get files for subject
+CREATE OR REPLACE FUNCTION GetFilesForSubject(p_subject_id INT)
+RETURNS TABLE (
+    id INT,
+    description VARCHAR(255),
+    file_path VARCHAR(512)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT f.id, f.description, f.file_path
+    FROM Files f
+    WHERE f.subject_id = p_subject_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get submissions for task
+CREATE OR REPLACE FUNCTION GetSubmissionsForTask(p_task_id INT)
+RETURNS TABLE (
+    id INT,
+    user_id INT,
+    status submission_status
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT s.id, s.user_id, s.status
+    FROM Submissions s
+    WHERE s.task_id = p_task_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get announcements for subject
+CREATE OR REPLACE FUNCTION GetAnnouncementsForSubject(p_subject_id INT)
+RETURNS TABLE (
+    id INT,
+    title VARCHAR(50),
+    content TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT sa.id, sa.title, sa.content
+    FROM SubjectAnnouncements sa
+    WHERE sa.subject_id = p_subject_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get events for subject
+CREATE OR REPLACE FUNCTION GetEventsForSubject(p_subject_id INT)
+RETURNS TABLE (
+    id INT,
+    date TIMESTAMP,
+    name VARCHAR(100),
+    location VARCHAR(255)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT se.id, se.date, se.name, se.location
+    FROM SubjectEvents se
+    WHERE se.subject_id = p_subject_id;
+END;
+$$ LANGUAGE plpgsql;
