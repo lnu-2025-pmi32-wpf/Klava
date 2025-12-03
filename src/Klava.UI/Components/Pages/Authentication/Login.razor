@@ -1,0 +1,111 @@
+@page "/login"
+@rendermode InteractiveServer
+@inject IAuthService AuthService
+@inject SessionService Session
+@inject NavigationManager Navigation
+
+<PageTitle>Login - Klava</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Login</h3>
+                    
+                    <EditForm Model="@model" OnValidSubmit="HandleLogin">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">First Name:</label>
+                            <InputText @bind-Value="model.Firstname" class="form-control" placeholder="Enter your first name" />
+                            <ValidationMessage For="@(() => model.Firstname)" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Last Name:</label>
+                            <InputText @bind-Value="model.Lastname" class="form-control" placeholder="Enter your last name" />
+                            <ValidationMessage For="@(() => model.Lastname)" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password:</label>
+                            <InputText type="password" @bind-Value="model.Password" class="form-control" placeholder="Enter your password" />
+                            <ValidationMessage For="@(() => model.Password)" />
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger">@errorMessage</div>
+                        }
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                Login
+                            </button>
+                        </div>
+                    </EditForm>
+                    
+                    <div class="text-center mt-3">
+                        <a href="/register" class="text-decoration-none">Don't have an account? Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel model = new();
+    private string? errorMessage;
+    private bool isLoading;
+    
+    private async System.Threading.Tasks.Task HandleLogin()
+    {
+        errorMessage = null;
+        isLoading = true;
+        
+        try
+        {
+            var user = await AuthService.LoginAsync(
+                model.Firstname,
+                model.Lastname,
+                model.Password
+            );
+            
+            if (user == null)
+            {
+                errorMessage = "Invalid credentials. Please check your name and password.";
+                return;
+            }
+            
+            Session.SetUser(user);
+            Navigation.NavigateTo("/teams");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "First name is required")]
+        public string Firstname { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "Last name is required")]
+        public string Lastname { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

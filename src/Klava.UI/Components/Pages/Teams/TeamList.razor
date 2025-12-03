@@ -1,0 +1,188 @@
+@page "/teams"
+@rendermode InteractiveServer
+@inject ITeamService TeamService
+@inject SessionService Session
+@inject NavigationManager Navigation
+
+<PageTitle>My Teams - Klava</PageTitle>
+
+<div class="container mt-4">
+    <h3>My Teams</h3>
+
+    @if (!Session.IsAuthenticated)
+    {
+        <div class="alert alert-warning">
+            <p>Please <a href="/login">log in</a> to view teams.</p>
+        </div>
+    }
+    else
+    {
+
+    <div class="mb-3">
+        <button class="btn btn-primary me-2" @onclick="NavigateToCreateTeam">
+            <span class="bi bi-plus-circle"></span> Create New Team
+        </button>
+        <button class="btn btn-secondary" @onclick="ShowJoinTeamDialog">
+            <span class="bi bi-box-arrow-in-right"></span> Join Team
+        </button>
+    </div>
+
+    @if (teams == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (!teams.Any())
+    {
+        <div class="alert alert-info">
+            <p>You are not a member of any teams yet.</p>
+            <p>Create a new team or join an existing one using an 8-character team code.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var team in teams)
+            {
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@team.Name</h5>
+                            <p class="card-text">
+                                <strong>Team Code:</strong> <code>@team.Code</code>
+                            </p>
+                            <button class="btn btn-primary btn-sm" @onclick="() => NavigateToTeam(team.Id)">
+                                <span class="bi bi-eye"></span> View Team
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (showJoinDialog)
+    {
+        <div class="modal" style="display:block; background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Join Team</h5>
+                        <button type="button" class="btn-close" @onclick="CloseJoinDialog"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Team Code:</label>
+                            <input type="text" @bind="joinCode" class="form-control" placeholder="Enter 8-character code" maxlength="8" />
+                        </div>
+                        @if (!string.IsNullOrEmpty(joinError))
+                        {
+                            <div class="alert alert-danger">@joinError</div>
+                        }
+                        @if (!string.IsNullOrEmpty(joinSuccess))
+                        {
+                            <div class="alert alert-success">@joinSuccess</div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="HandleJoinTeam" disabled="@isJoining">
+                            @if (isJoining)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                            }
+                            Join
+                        </button>
+                        <button class="btn btn-secondary" @onclick="CloseJoinDialog">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    }
+</div>
+
+@code {
+    private List<Team>? teams;
+    private bool showJoinDialog = false;
+    private string joinCode = string.Empty;
+    private string? joinError;
+    private string? joinSuccess;
+    private bool isJoining;
+    
+    protected override async System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        await LoadTeams();
+    }
+    
+    private async System.Threading.Tasks.Task LoadTeams()
+    {
+        if (Session.CurrentUser != null)
+        {
+            teams = await TeamService.GetUserTeamsAsync(Session.CurrentUser.Id);
+        }
+    }
+    
+    private void NavigateToCreateTeam()
+    {
+        Navigation.NavigateTo("/teams/create");
+    }
+    
+    private void NavigateToTeam(int teamId)
+    {
+        Navigation.NavigateTo($"/teams/{teamId}");
+    }
+    
+    private void ShowJoinTeamDialog()
+    {
+        showJoinDialog = true;
+        joinCode = string.Empty;
+        joinError = null;
+        joinSuccess = null;
+    }
+    
+    private void CloseJoinDialog()
+    {
+        showJoinDialog = false;
+    }
+    
+    private async System.Threading.Tasks.Task HandleJoinTeam()
+    {
+        joinError = null;
+        joinSuccess = null;
+        
+        if (string.IsNullOrWhiteSpace(joinCode) || joinCode.Length != 8)
+        {
+            joinError = "Please enter a valid 8-character code.";
+            return;
+        }
+        
+        isJoining = true;
+        
+        try
+        {
+            var success = await TeamService.JoinTeamAsync(Session.CurrentUser!.Id, joinCode.ToUpper());
+            
+            if (!success)
+            {
+                joinError = "Could not join team. The code may be invalid or you may already be a member.";
+                return;
+            }
+            
+            joinSuccess = "Successfully joined team! Reloading...";
+            await Task.Delay(1000);
+            await LoadTeams();
+            CloseJoinDialog();
+        }
+        catch (Exception ex)
+        {
+            joinError = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            isJoining = false;
+        }
+    }
+}
