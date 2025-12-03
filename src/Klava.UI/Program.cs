@@ -1,5 +1,7 @@
 using Klava.UI.Components;
 using Klava.Infrastructure.Data;
+using Klava.Application.Services.Interfaces;
+using Klava.Application.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,12 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 
 var app = builder.Build();
 
