@@ -28,11 +28,7 @@ public class SubjectConfiguration : IEntityTypeConfiguration<Subject>
             .HasColumnName("subject_info");
             
         builder.Property(e => e.Status)
-            .HasColumnName("status")
-            .HasConversion(
-                v => v.ToString().ToLower(),
-                v => (SubjectStatus)Enum.Parse(typeof(SubjectStatus), v, true))
-            .HasColumnType("subject_status");
+            .HasColumnName("status");
         
         builder.HasOne(e => e.Team)
             .WithMany(t => t.Subjects)

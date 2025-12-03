@@ -20,11 +20,7 @@ public class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMember>
             .HasColumnName("user_id");
             
         builder.Property(e => e.Role)
-            .HasColumnName("role")
-            .HasConversion(
-                v => v.ToString().ToLower(),
-                v => (TeamMemberRole)Enum.Parse(typeof(TeamMemberRole), v, true))
-            .HasColumnType("team_member_role");
+            .HasColumnName("role");
         
         builder.HasOne(e => e.Team)
             .WithMany(t => t.Members)

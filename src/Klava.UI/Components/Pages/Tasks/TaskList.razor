@@ -1,0 +1,259 @@
+@page "/tasks"
+@rendermode InteractiveServer
+@inject ITaskService TaskService
+@inject ISubjectService SubjectService
+@inject SessionService Session
+@inject NavigationManager Navigation
+
+<PageTitle>Tasks - Klava</PageTitle>
+
+<div class="container mt-4">
+    <h3>Tasks</h3>
+
+    @if (!Session.IsAuthenticated)
+    {
+        <div class="alert alert-warning">
+            <p>Please <a href="/login">log in</a> to view tasks.</p>
+        </div>
+    }
+    else if (tasks == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <button class="btn btn-primary" @onclick="ShowCreateTaskDialog">
+                <span class="bi bi-plus-circle"></span> Create Task
+            </button>
+            <a href="/teams" class="btn btn-secondary ms-2">
+                <span class="bi bi-arrow-left"></span> Back to Teams
+            </a>
+        </div>
+
+        @if (!tasks.Any())
+        {
+            <div class="alert alert-info">
+                <p>No tasks yet. Create one to get started!</p>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var task in tasks.OrderBy(t => t.Deadline))
+                {
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card @(task.Deadline.HasValue && task.Deadline.Value < DateTime.UtcNow ? "border-danger" : "")">
+                            <div class="card-body">
+                                <h5 class="card-title">@task.Name</h5>
+                                <p class="card-text">
+                                    <small class="text-muted">Subject: @task.Subject?.Title</small>
+                                </p>
+                                @if (!string.IsNullOrEmpty(task.Description))
+                                {
+                                    <p class="card-text">@task.Description</p>
+                                }
+                                @if (task.Deadline.HasValue)
+                                {
+                                    <p class="card-text">
+                                        <strong>Deadline:</strong> 
+                                        <span class="@(task.Deadline.Value < DateTime.UtcNow ? "text-danger" : "")">
+                                            @task.Deadline.Value.ToLocalTime().ToString("MMM dd, yyyy HH:mm")
+                                        </span>
+                                    </p>
+                                }
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" @onclick="() => EditTask(task)">
+                                        <span class="bi bi-pencil"></span> Edit
+                                    </button>
+                                    <button class="btn btn-outline-danger" @onclick="() => DeleteTask(task.Id)">
+                                        <span class="bi bi-trash"></span> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+
+    @if (showTaskDialog)
+    {
+        <div class="modal" style="display:block; background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@(editingTask == null ? "Create Task" : "Edit Task")</h5>
+                        <button type="button" class="btn-close" @onclick="CloseTaskDialog"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Subject:</label>
+                            <select @bind="taskModel.SubjectId" class="form-select">
+                                <option value="0">Select a subject</option>
+                                @foreach (var subject in subjects)
+                                {
+                                    <option value="@subject.Id">@subject.Title</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Task Name:</label>
+                            <input type="text" @bind="taskModel.Name" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description (optional):</label>
+                            <textarea @bind="taskModel.Description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deadline (optional):</label>
+                            <input type="datetime-local" @bind="taskModel.Deadline" class="form-control" />
+                        </div>
+                        @if (!string.IsNullOrEmpty(taskError))
+                        {
+                            <div class="alert alert-danger">@taskError</div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @onclick="HandleSaveTask">
+                            @(editingTask == null ? "Create" : "Save")
+                        </button>
+                        <button class="btn btn-secondary" @onclick="CloseTaskDialog">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? TeamId { get; set; }
+    
+    [SupplyParameterFromQuery]
+    public int? SubjectId { get; set; }
+    
+    private List<Klava.Domain.Entities.Task>? tasks;
+    private List<Subject> subjects = new();
+    private bool showTaskDialog = false;
+    private Klava.Domain.Entities.Task? editingTask = null;
+    private TaskModel taskModel = new();
+    private string? taskError;
+    
+    protected override async System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        await LoadTasks();
+    }
+    
+    private async System.Threading.Tasks.Task LoadTasks()
+    {
+        if (SubjectId.HasValue)
+        {
+            tasks = await TaskService.GetTasksBySubjectAsync(SubjectId.Value);
+            var subject = await SubjectService.GetSubjectByIdAsync(SubjectId.Value);
+            if (subject != null)
+            {
+                subjects = new List<Subject> { subject };
+            }
+        }
+        else if (TeamId.HasValue)
+        {
+            tasks = await TaskService.GetTasksByTeamAsync(TeamId.Value);
+            subjects = await SubjectService.GetSubjectsByTeamAsync(TeamId.Value);
+        }
+        else
+        {
+            tasks = new List<Klava.Domain.Entities.Task>();
+        }
+    }
+    
+    private void ShowCreateTaskDialog()
+    {
+        showTaskDialog = true;
+        editingTask = null;
+        taskModel = new TaskModel 
+        { 
+            SubjectId = SubjectId ?? 0 
+        };
+        taskError = null;
+    }
+    
+    private void EditTask(Klava.Domain.Entities.Task task)
+    {
+        showTaskDialog = true;
+        editingTask = task;
+        taskModel = new TaskModel
+        {
+            SubjectId = task.SubjectId,
+            Name = task.Name,
+            Description = task.Description,
+            Deadline = task.Deadline?.ToLocalTime()
+        };
+        taskError = null;
+    }
+    
+    private void CloseTaskDialog()
+    {
+        showTaskDialog = false;
+    }
+    
+    private async System.Threading.Tasks.Task HandleSaveTask()
+    {
+        if (taskModel.SubjectId == 0)
+        {
+            taskError = "Please select a subject";
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(taskModel.Name))
+        {
+            taskError = "Task name is required";
+            return;
+        }
+        
+        try
+        {
+            DateTime? deadline = taskModel.Deadline?.ToUniversalTime();
+            
+            if (editingTask == null)
+            {
+                await TaskService.CreateTaskAsync(taskModel.SubjectId, taskModel.Name, taskModel.Description, deadline);
+            }
+            else
+            {
+                await TaskService.UpdateTaskAsync(editingTask.Id, taskModel.Name, taskModel.Description, deadline);
+            }
+            
+            await LoadTasks();
+            CloseTaskDialog();
+        }
+        catch (Exception ex)
+        {
+            taskError = $"Error: {ex.Message}";
+        }
+    }
+    
+    private async System.Threading.Tasks.Task DeleteTask(int taskId)
+    {
+        if (confirm("Are you sure you want to delete this task?"))
+        {
+            await TaskService.DeleteTaskAsync(taskId);
+            await LoadTasks();
+        }
+    }
+    
+    private bool confirm(string message) => true; // Simplified for now
+    
+    public class TaskModel
+    {
+        public int SubjectId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public DateTime? Deadline { get; set; }
+    }
+}

@@ -1,0 +1,112 @@
+@page "/teams/create"
+@rendermode InteractiveServer
+@inject ITeamService TeamService
+@inject SessionService Session
+@inject NavigationManager Navigation
+
+<PageTitle>Create Team - Klava</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Create New Team</h3>
+                    
+                    @if (!Session.IsAuthenticated)
+                    {
+                        <div class="alert alert-warning">
+                            <p>Please <a href="/login">log in</a> to create a team.</p>
+                        </div>
+                    }
+                    else
+                    {
+                    <EditForm Model="@model" OnValidSubmit="HandleCreateTeam">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Team Name:</label>
+                            <InputText @bind-Value="model.Name" class="form-control" placeholder="Enter team name" />
+                            <ValidationMessage For="@(() => model.Name)" />
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger">@errorMessage</div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(successMessage))
+                        {
+                            <div class="alert alert-success">
+                                <strong>@successMessage</strong>
+                                @if (!string.IsNullOrEmpty(teamCode))
+                                {
+                                    <p class="mt-2 mb-0">
+                                        Your team code is: <code class="fs-5">@teamCode</code>
+                                        <br />
+                                        <small>Share this code with team members so they can join.</small>
+                                    </p>
+                                }
+                            </div>
+                        }
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                                @if (isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                Create Team
+                            </button>
+                            <a href="/teams" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CreateTeamModel model = new();
+    private string? errorMessage;
+    private string? successMessage;
+    private string? teamCode;
+    private bool isLoading;
+    
+    private async System.Threading.Tasks.Task HandleCreateTeam()
+    {
+        errorMessage = null;
+        successMessage = null;
+        teamCode = null;
+        isLoading = true;
+        
+        try
+        {
+            var team = await TeamService.CreateTeamAsync(model.Name, Session.CurrentUser!.Id);
+            
+            teamCode = team.Code;
+            successMessage = "Team created successfully!";
+            
+            await Task.Delay(3000);
+            Navigation.NavigateTo($"/teams/{team.Id}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    
+    public class CreateTeamModel
+    {
+        [Required(ErrorMessage = "Team name is required")]
+        [StringLength(50, ErrorMessage = "Team name must be 50 characters or less")]
+        public string Name { get; set; } = string.Empty;
+    }
+}
