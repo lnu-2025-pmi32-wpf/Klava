@@ -1,0 +1,83 @@
+﻿<Window x:Class="Klava.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Klava.WPF"
+        xmlns:vm="clr-namespace:Klava.WPF.ViewModels"
+        xmlns:views="clr-namespace:Klava.WPF.Views"
+        xmlns:converters="clr-namespace:Klava.WPF.Converters"
+        mc:Ignorable="d"
+        Title="Klava - Student Task Management" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <!-- Converters -->
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        
+        <!-- DataTemplates for automatic View-ViewModel binding -->
+        <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+            <views:LoginView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RegisterViewModel}">
+            <views:RegisterView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TeamListViewModel}">
+            <views:TeamListView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CreateTeamViewModel}">
+            <views:CreateTeamView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TeamDashboardViewModel}">
+            <views:TeamDashboardView />
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2196F3" Padding="10">
+            <Grid>
+                <TextBlock Text="Klava - Student Task Management" 
+                           FontSize="20" 
+                           FontWeight="Bold" 
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding CurrentUserName}" 
+                               Foreground="White" 
+                               FontSize="14"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"/>
+                    <TextBlock Text="●" 
+                               Foreground="LightGreen" 
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Content Area -->
+        <ContentControl Grid.Row="1" 
+                        Content="{Binding CurrentViewModel}"
+                        Margin="10"/>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#f5f5f5" Padding="10" BorderThickness="0,1,0,0" BorderBrush="#e0e0e0">
+            <TextBlock Text="2025 Klava - Phase 1: Infrastructure and Basic Auth" 
+                       FontSize="12" 
+                       Foreground="#666"
+                       HorizontalAlignment="Center"/>
+        </Border>
+    </Grid>
+</Window>
