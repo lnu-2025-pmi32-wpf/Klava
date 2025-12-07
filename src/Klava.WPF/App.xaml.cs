@@ -3,6 +3,7 @@ using System.Windows;
 using WpfApp = System.Windows.Application;
 using Klava.Application.Services.Implementations;
 using Klava.Application.Services.Interfaces;
+using Klava.Domain.Enums;
 using Klava.Infrastructure.Data;
 using Klava.WPF.Services;
 using Klava.WPF.ViewModels;
@@ -10,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 namespace Klava.WPF;
 
@@ -34,9 +37,16 @@ public partial class App : WpfApp
                 var configuration = context.Configuration;
                 var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-                // Register DbContext
+                // Enable legacy timestamp behavior globally for Npgsql
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+                // Register DbContext with enum mapping configuration
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseNpgsql(connectionString), ServiceLifetime.Transient);
+                    options.UseNpgsql(connectionString, npgsqlOptions =>
+                    {
+                        npgsqlOptions.MapEnum<TeamMemberRole>("team_member_role");
+                        npgsqlOptions.MapEnum<SubjectStatus>("subject_status");
+                    }), ServiceLifetime.Transient);
 
                 // Register Application Services
                 services.AddTransient<IAuthService, AuthService>();
@@ -57,6 +67,9 @@ public partial class App : WpfApp
                 services.AddTransient<TeamListViewModel>();
                 services.AddTransient<CreateTeamViewModel>();
                 services.AddTransient<TeamDashboardViewModel>();
+                services.AddTransient<ManageMembersViewModel>();
+                services.AddTransient<SubjectListViewModel>();
+                services.AddTransient<TaskListViewModel>();
 
                 // Register MainWindow
                 services.AddSingleton<MainWindow>();

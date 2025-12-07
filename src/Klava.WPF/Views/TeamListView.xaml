@@ -21,7 +21,7 @@
                        VerticalAlignment="Center"/>
             <Button Content="Logout" 
                     Command="{Binding LogoutCommand}"
-                    Margin="Auto,0,0,0"
+                    Margin="15,0,0,0"
                     Padding="15,8"
                     Background="#f44336"
                     Foreground="White"
