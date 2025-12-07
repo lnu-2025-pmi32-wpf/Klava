@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<Task> Tasks { get; set; }
     public DbSet<SubjectFile> SubjectFiles { get; set; }
+    public DbSet<Submission> Submissions { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

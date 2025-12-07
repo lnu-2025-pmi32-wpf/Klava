@@ -15,7 +15,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         o => o.MapEnum<Klava.Domain.Enums.TeamMemberRole>("team_member_role")
-              .MapEnum<Klava.Domain.Enums.SubjectStatus>("subject_status")));
+              .MapEnum<Klava.Domain.Enums.SubjectStatus>("subject_status")
+              .MapEnum<Klava.Domain.Enums.SubmissionStatus>("submission_status")));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<ISubjectFileService, SubjectFileService>();
+builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 
 var fileStoragePath = Path.Combine(builder.Environment.ContentRootPath, "uploads");
 builder.Services.AddScoped<IFileStorageService>(sp => new FileStorageService(fileStoragePath));
