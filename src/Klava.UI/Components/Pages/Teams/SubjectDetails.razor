@@ -1,0 +1,297 @@
+@page "/subjects/{SubjectId:int}"
+@rendermode InteractiveServer
+@inject ISubjectService SubjectService
+@inject ISubjectFileService FileService
+@inject IMemberService MemberService
+@inject SessionService Session
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Subject Details - Klava</PageTitle>
+
+<div class="container mt-4">
+    @if (!Session.IsAuthenticated)
+    {
+        <div class="alert alert-warning">
+            <p>Please <a href="/login">log in</a> to view subject.</p>
+        </div>
+    }
+    else if (subject == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3>@subject.Title</h3>
+                <span class="badge @(subject.Status == SubjectStatus.Exam ? "bg-danger" : "bg-info")">
+                    @subject.Status
+                </span>
+            </div>
+            <a href="/teams/@subject.TeamId" class="btn btn-secondary">
+                <span class="bi bi-arrow-left"></span> Back to Team
+            </a>
+        </div>
+
+        @if (!string.IsNullOrEmpty(subject.SubjectInfo))
+        {
+            <div class="alert alert-info">
+                @subject.SubjectInfo
+            </div>
+        }
+
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link @(activeTab == "tasks" ? "active" : "")" 
+                   @onclick='() => activeTab = "tasks"' 
+                   style="cursor: pointer;">
+                    <span class="bi bi-list-task"></span> Tasks
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(activeTab == "files" ? "active" : "")" 
+                   @onclick='() => activeTab = "files"' 
+                   style="cursor: pointer;">
+                    <span class="bi bi-file-earmark"></span> Files
+                </a>
+            </li>
+        </ul>
+
+        @if (activeTab == "tasks")
+        {
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted">Task management coming soon...</p>
+                    <a href="/tasks?teamId=@subject.TeamId&subjectId=@SubjectId" class="btn btn-primary">
+                        View Tasks
+                    </a>
+                </div>
+            </div>
+        }
+        else if (activeTab == "files")
+        {
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Files (@files.Count)</h5>
+                    @if (isHeadman)
+                    {
+                        <label class="btn btn-sm btn-primary">
+                            <span class="bi bi-upload"></span> Upload
+                            <InputFile OnChange="HandleFileSelected" class="d-none" multiple />
+                        </label>
+                    }
+                </div>
+                <div class="card-body">
+                    @if (isUploading)
+                    {
+                        <div class="alert alert-info">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Uploading files...
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(fileMessage))
+                    {
+                        <div class="alert @(fileMessageIsError ? "alert-danger" : "alert-success")">
+                            @fileMessage
+                        </div>
+                    }
+
+                    @if (files.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Size</th>
+                                        <th>Uploaded</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var file in files)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="bi bi-file-earmark"></span>
+                                                @file.DisplayName
+                                            </td>
+                                            <td>@FormatFileSize(file.Size)</td>
+                                            <td>@file.UploadedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</td>
+                                            <td>
+                                                <a href="/api/files/download/@file.Id" 
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   target="_blank">
+                                                    <span class="bi bi-download"></span> Download
+                                                </a>
+                                                @if (isHeadman)
+                                                {
+                                                    <button class="btn btn-sm btn-outline-danger ms-2" 
+                                                            @onclick="() => DeleteFile(file.Id)">
+                                                        <span class="bi bi-trash"></span> Delete
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No files uploaded yet. @(isHeadman ? "Upload files to share with team members." : "")</p>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int SubjectId { get; set; }
+
+    private Subject? subject;
+    private List<SubjectFile> files = new();
+    private bool isHeadman = false;
+    private string activeTab = "files";
+    private bool isUploading = false;
+    private string? fileMessage;
+    private bool fileMessageIsError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubject();
+        await LoadFiles();
+        await CheckPermissions();
+    }
+
+    private async Task LoadSubject()
+    {
+        subject = await SubjectService.GetSubjectByIdAsync(SubjectId);
+    }
+
+    private async Task LoadFiles()
+    {
+        files = await FileService.GetFilesBySubjectAsync(SubjectId);
+    }
+
+    private async Task CheckPermissions()
+    {
+        if (Session.CurrentUser != null && subject != null)
+        {
+            isHeadman = await MemberService.IsHeadmanAsync(Session.CurrentUser.Id, subject.TeamId);
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        if (!isHeadman)
+        {
+            fileMessage = "You don't have permission to upload files.";
+            fileMessageIsError = true;
+            return;
+        }
+
+        isUploading = true;
+        fileMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var maxFileSize = 10 * 1024 * 1024;
+            var uploadedCount = 0;
+
+            foreach (var file in e.GetMultipleFiles(10))
+            {
+                try
+                {
+                    using var stream = file.OpenReadStream(maxFileSize);
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    memoryStream.Position = 0;
+
+                    var request = new UploadFileRequest
+                    {
+                        SubjectId = SubjectId,
+                        FileName = file.Name,
+                        ContentType = file.ContentType,
+                        Size = file.Size,
+                        FileStream = memoryStream
+                    };
+
+                    var result = await FileService.UploadFileAsync(request);
+                    if (result != null)
+                    {
+                        uploadedCount++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    fileMessage = $"Error uploading {file.Name}: {ex.Message}";
+                    fileMessageIsError = true;
+                }
+            }
+
+            if (uploadedCount > 0)
+            {
+                fileMessage = $"Successfully uploaded {uploadedCount} file(s).";
+                fileMessageIsError = false;
+                await LoadFiles();
+            }
+        }
+        catch (Exception ex)
+        {
+            fileMessage = $"Upload failed: {ex.Message}";
+            fileMessageIsError = true;
+        }
+        finally
+        {
+            isUploading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeleteFile(int fileId)
+    {
+        if (!isHeadman)
+            return;
+
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this file?");
+        if (!confirmed)
+            return;
+
+        var success = await FileService.DeleteFileAsync(fileId);
+        if (success)
+        {
+            fileMessage = "File deleted successfully.";
+            fileMessageIsError = false;
+            await LoadFiles();
+        }
+        else
+        {
+            fileMessage = "Failed to delete file.";
+            fileMessageIsError = true;
+        }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+}
