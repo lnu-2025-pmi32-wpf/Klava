@@ -10,6 +10,8 @@ public class User
     
     public string Password { get; set; } = string.Empty; 
     
+    // Navigation properties
     public ICollection<TeamMember> TeamMemberships { get; set; } = new List<TeamMember>();
     public ICollection<Team> OwnedTeams { get; set; } = new List<Team>();
+    public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }

@@ -4,6 +4,7 @@ using Klava.Domain.Enums;
 using Klava.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Klava.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251207135317_AddSubjectFileEntity")]
+    partial class AddSubjectFileEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,6 @@ namespace Klava.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "subject_status", new[] { "exam", "test" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "submission_status", new[] { "done", "wait" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "team_member_role", new[] { "headman", "student" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -104,42 +106,6 @@ namespace Klava.Infrastructure.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("subjectfiles", (string)null);
-                });
-
-            modelBuilder.Entity("Klava.Domain.Entities.Submission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("submission_status")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("submitted_at");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("integer")
-                        .HasColumnName("task_id");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("TaskId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("submissions", (string)null);
                 });
 
             modelBuilder.Entity("Klava.Domain.Entities.Task", b =>
@@ -286,25 +252,6 @@ namespace Klava.Infrastructure.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("Klava.Domain.Entities.Submission", b =>
-                {
-                    b.HasOne("Klava.Domain.Entities.Task", "Task")
-                        .WithMany("Submissions")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Klava.Domain.Entities.User", "User")
-                        .WithMany("Submissions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Task");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Klava.Domain.Entities.Task", b =>
                 {
                     b.HasOne("Klava.Domain.Entities.Subject", "Subject")
@@ -352,11 +299,6 @@ namespace Klava.Infrastructure.Migrations
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("Klava.Domain.Entities.Task", b =>
-                {
-                    b.Navigation("Submissions");
-                });
-
             modelBuilder.Entity("Klava.Domain.Entities.Team", b =>
                 {
                     b.Navigation("Members");
@@ -367,8 +309,6 @@ namespace Klava.Infrastructure.Migrations
             modelBuilder.Entity("Klava.Domain.Entities.User", b =>
                 {
                     b.Navigation("OwnedTeams");
-
-                    b.Navigation("Submissions");
 
                     b.Navigation("TeamMemberships");
                 });
