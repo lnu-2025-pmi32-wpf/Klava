@@ -7,6 +7,7 @@
         <converters:NullToVisibilityConverter x:Key="NullToVisibility"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <converters:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
+        <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
     </UserControl.Resources>
     
     <Grid Margin="20">
@@ -96,14 +97,21 @@
                                 <StackPanel Grid.Column="1" 
                                             Orientation="Vertical" 
                                             VerticalAlignment="Center">
-                                    <Button Content="View Tasks" 
+                                    <Button Content="📁 View Files" 
+                                            Command="{Binding DataContext.ViewFilesCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Background="#2196F3"
+                                            Foreground="White"
+                                            Padding="10,5"
+                                            Margin="0,0,0,5"/>
+                                    <Button Content="📝 View Tasks" 
                                             Command="{Binding DataContext.ViewTasksCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}"
                                             Background="#4CAF50"
                                             Foreground="White"
                                             Padding="10,5"
                                             Margin="0,0,0,5"/>
-                                    <Button Content="Delete" 
+                                    <Button Content="🗑 Delete" 
                                             Command="{Binding DataContext.DeleteSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}"
                                             Background="#F44336"

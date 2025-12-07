@@ -16,10 +16,26 @@ public class FileStorageService : IFileStorageService
         }
     }
 
-    public async Task<string> SaveFileAsync(Stream fileStream, string fileName)
+    public async Task<string> SaveFileAsync(Stream fileStream, string fileName, int? subjectId = null)
     {
-        var storageName = $"{Guid.NewGuid()}{Path.GetExtension(fileName)}";
-        var filePath = Path.Combine(_storagePath, storageName);
+        // Create subject-specific folder if subjectId is provided
+        var targetPath = _storagePath;
+        if (subjectId.HasValue)
+        {
+            targetPath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}");
+            if (!Directory.Exists(targetPath))
+            {
+                Directory.CreateDirectory(targetPath);
+            }
+        }
+
+        // Generate unique filename with timestamp and GUID
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+        var guid = Guid.NewGuid().ToString("N")[..8]; // First 8 chars of GUID
+        var extension = Path.GetExtension(fileName);
+        var storageName = $"{timestamp}_{guid}{extension}";
+        
+        var filePath = Path.Combine(targetPath, storageName);
 
         using (var fileStreamOutput = new FileStream(filePath, FileMode.Create, FileAccess.Write))
         {
@@ -29,9 +45,21 @@ public class FileStorageService : IFileStorageService
         return storageName;
     }
 
-    public async Task<Stream?> GetFileAsync(string storageName)
+    public async Task<Stream?> GetFileAsync(string storageName, int? subjectId = null)
     {
-        var filePath = Path.Combine(_storagePath, storageName);
+        // Try subject-specific folder first if subjectId is provided
+        string? filePath = null;
+        
+        if (subjectId.HasValue)
+        {
+            filePath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}", storageName);
+        }
+        
+        // Fallback to root storage path
+        if (filePath == null || !File.Exists(filePath))
+        {
+            filePath = Path.Combine(_storagePath, storageName);
+        }
 
         if (!File.Exists(filePath))
         {
@@ -48,9 +76,21 @@ public class FileStorageService : IFileStorageService
         return memoryStream;
     }
 
-    public Task<bool> DeleteFileAsync(string storageName)
+    public Task<bool> DeleteFileAsync(string storageName, int? subjectId = null)
     {
-        var filePath = Path.Combine(_storagePath, storageName);
+        // Try subject-specific folder first if subjectId is provided
+        string? filePath = null;
+        
+        if (subjectId.HasValue)
+        {
+            filePath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}", storageName);
+        }
+        
+        // Fallback to root storage path
+        if (filePath == null || !File.Exists(filePath))
+        {
+            filePath = Path.Combine(_storagePath, storageName);
+        }
 
         if (!File.Exists(filePath))
         {
@@ -68,9 +108,22 @@ public class FileStorageService : IFileStorageService
         }
     }
 
-    public Task<bool> FileExistsAsync(string storageName)
+    public Task<bool> FileExistsAsync(string storageName, int? subjectId = null)
     {
-        var filePath = Path.Combine(_storagePath, storageName);
+        // Try subject-specific folder first if subjectId is provided
+        string? filePath = null;
+        
+        if (subjectId.HasValue)
+        {
+            filePath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}", storageName);
+        }
+        
+        // Fallback to root storage path
+        if (filePath == null || !File.Exists(filePath))
+        {
+            filePath = Path.Combine(_storagePath, storageName);
+        }
+        
         return Task.FromResult(File.Exists(filePath));
     }
 }

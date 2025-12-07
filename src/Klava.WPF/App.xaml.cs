@@ -46,6 +46,7 @@ public partial class App : WpfApp
                     {
                         npgsqlOptions.MapEnum<TeamMemberRole>("team_member_role");
                         npgsqlOptions.MapEnum<SubjectStatus>("subject_status");
+                        npgsqlOptions.MapEnum<SubmissionStatus>("submission_status");
                     }), ServiceLifetime.Transient);
 
                 // Register Application Services
@@ -54,6 +55,13 @@ public partial class App : WpfApp
                 services.AddTransient<IMemberService, MemberService>();
                 services.AddTransient<ITaskService, TaskService>();
                 services.AddTransient<ISubjectService, SubjectService>();
+                services.AddTransient<ISubjectFileService, SubjectFileService>();
+                services.AddTransient<ISubmissionService, SubmissionService>();
+
+                // Configure file storage
+                var fileStoragePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+                services.AddSingleton<Klava.Infrastructure.Interfaces.IFileStorageService>(
+                    sp => new Klava.Infrastructure.Services.FileStorageService(fileStoragePath));
 
                 // Register UI Services
                 services.AddSingleton<SessionService>();
@@ -69,6 +77,7 @@ public partial class App : WpfApp
                 services.AddTransient<TeamDashboardViewModel>();
                 services.AddTransient<ManageMembersViewModel>();
                 services.AddTransient<SubjectListViewModel>();
+                services.AddTransient<SubjectDetailsViewModel>();
                 services.AddTransient<TaskListViewModel>();
 
                 // Register MainWindow

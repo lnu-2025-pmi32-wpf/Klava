@@ -39,6 +39,9 @@
         <DataTemplate DataType="{x:Type vm:SubjectListViewModel}">
             <views:SubjectListView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SubjectDetailsViewModel}">
+            <views:SubjectDetailsView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:TaskListViewModel}">
             <views:TaskListView />
         </DataTemplate>

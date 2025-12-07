@@ -67,75 +67,194 @@
                                HorizontalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- Tasks Items -->
-                <ItemsControl ItemsSource="{Binding Tasks}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="White" 
-                                    BorderBrush="#E0E0E0" 
-                                    BorderThickness="1" 
-                                    Padding="15" 
-                                    Margin="0,0,0,10"
-                                    CornerRadius="4">
-                                <Border.Effect>
-                                    <DropShadowEffect BlurRadius="4" 
-                                                      ShadowDepth="2" 
-                                                      Opacity="0.2"/>
-                                </Border.Effect>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                <!-- To Do Section -->
+                <Border Background="#FFF9C4" 
+                        BorderBrush="#FFC107" 
+                        BorderThickness="2" 
+                        Padding="15" 
+                        Margin="0,0,0,20"
+                        CornerRadius="4">
+                    <StackPanel>
+                        <TextBlock FontSize="20" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,15">
+                            <Run Text="⏰ To Do ("/>
+                            <Run Text="{Binding TodoTasks.Count, Mode=OneWay}"/>
+                            <Run Text=")"/>
+                        </TextBlock>
 
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding Name}" 
-                                                   FontSize="18" 
-                                                   FontWeight="Bold" 
-                                                   Margin="0,0,0,5"/>
-                                        <TextBlock Text="{Binding Description}" 
-                                                   TextWrapping="Wrap" 
-                                                   Margin="0,0,0,5"
-                                                   Visibility="{Binding Description, Converter={StaticResource NullToVisibility}}"/>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Subject: " 
-                                                       FontWeight="Bold" 
-                                                       Margin="0,0,5,0"/>
-                                            <TextBlock Text="{Binding Subject.Title}"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" 
-                                                    Margin="0,5,0,0"
-                                                    Visibility="{Binding Deadline, Converter={StaticResource NullToVisibility}}">
-                                            <TextBlock Text="Deadline: " 
-                                                       FontWeight="Bold" 
-                                                       Margin="0,0,5,0"/>
-                                            <TextBlock Text="{Binding Deadline, StringFormat='MMM dd, yyyy HH:mm'}"/>
-                                        </StackPanel>
-                                    </StackPanel>
+                        <ItemsControl ItemsSource="{Binding TodoTasks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" 
+                                            BorderBrush="#E0E0E0" 
+                                            BorderThickness="1" 
+                                            Padding="15" 
+                                            Margin="0,0,0,10"
+                                            CornerRadius="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="1" 
-                                                Orientation="Vertical" 
-                                                VerticalAlignment="Center"
-                                                Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
-                                        <Button Content="Edit" 
-                                                Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Background="#FF9800"
-                                                Foreground="White"
-                                                Padding="10,5"
-                                                Margin="0,0,0,5"/>
-                                        <Button Content="Delete" 
-                                                Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Background="#F44336"
-                                                Foreground="White"
-                                                Padding="10,5"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Name}" 
+                                                           FontSize="18" 
+                                                           FontWeight="Bold" 
+                                                           Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding Description}" 
+                                                           TextWrapping="Wrap" 
+                                                           Margin="0,0,0,5"
+                                                           Visibility="{Binding Description, Converter={StaticResource NullToVisibility}}"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="📚 Subject: " 
+                                                               FontWeight="Bold" 
+                                                               Margin="0,0,5,0"/>
+                                                    <TextBlock Text="{Binding SubjectTitle}"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" 
+                                                            Margin="0,5,0,0"
+                                                            Visibility="{Binding Deadline, Converter={StaticResource NullToVisibility}}">
+                                                    <TextBlock Text="📅 Deadline: " 
+                                                               FontWeight="Bold" 
+                                                               Margin="0,0,5,0"/>
+                                                    <TextBlock Text="{Binding Deadline, StringFormat='MMM dd, yyyy HH:mm'}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" 
+                                                        Orientation="Vertical" 
+                                                        VerticalAlignment="Center">
+                                                <Button Content="✓ Mark Done" 
+                                                        Command="{Binding DataContext.ToggleTaskStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#4CAF50"
+                                                        Foreground="White"
+                                                        Padding="10,5"
+                                                        Margin="0,0,0,5"/>
+                                                <Button Content="✏ Edit" 
+                                                        Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#FF9800"
+                                                        Foreground="White"
+                                                        Padding="10,5"
+                                                        Margin="0,0,0,5"
+                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                                <Button Content="🗑 Delete" 
+                                                        Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#F44336"
+                                                        Foreground="White"
+                                                        Padding="10,5"
+                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Done Section -->
+                <Border Background="#C8E6C9" 
+                        BorderBrush="#4CAF50" 
+                        BorderThickness="2" 
+                        Padding="15" 
+                        Margin="0,0,0,20"
+                        CornerRadius="4">
+                    <StackPanel>
+                        <TextBlock FontSize="20" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,15">
+                            <Run Text="✓ Done ("/>
+                            <Run Text="{Binding DoneTasks.Count, Mode=OneWay}"/>
+                            <Run Text=")"/>
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding DoneTasks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" 
+                                            BorderBrush="#E0E0E0" 
+                                            BorderThickness="1" 
+                                            Padding="15" 
+                                            Margin="0,0,0,10"
+                                            CornerRadius="4"
+                                            Opacity="0.8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock FontSize="18" 
+                                                           FontWeight="Bold" 
+                                                           Margin="0,0,0,5"
+                                                           TextDecorations="Strikethrough"
+                                                           Foreground="#757575">
+                                                    <Run Text="{Binding Name}"/>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding Description}" 
+                                                           TextWrapping="Wrap" 
+                                                           Margin="0,0,0,5"
+                                                           Foreground="#757575"
+                                                           Visibility="{Binding Description, Converter={StaticResource NullToVisibility}}"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="📚 Subject: " 
+                                                               FontWeight="Bold" 
+                                                               Margin="0,0,5,0"
+                                                               Foreground="#757575"/>
+                                                    <TextBlock Text="{Binding SubjectTitle}"
+                                                               Foreground="#757575"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" 
+                                                            Margin="0,5,0,0"
+                                                            Visibility="{Binding SubmittedAt, Converter={StaticResource NullToVisibility}}">
+                                                    <TextBlock Text="✓ Completed: " 
+                                                               FontWeight="Bold" 
+                                                               Margin="0,0,5,0"
+                                                               Foreground="#4CAF50"/>
+                                                    <TextBlock Text="{Binding SubmittedAt, StringFormat='MMM dd, yyyy HH:mm'}"
+                                                               Foreground="#4CAF50"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" 
+                                                        Orientation="Vertical" 
+                                                        VerticalAlignment="Center">
+                                                <Button Content="↶ Mark Undone" 
+                                                        Command="{Binding DataContext.ToggleTaskStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#FF9800"
+                                                        Foreground="White"
+                                                        Padding="10,5"
+                                                        Margin="0,0,0,5"/>
+                                                <Button Content="✏ Edit" 
+                                                        Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#757575"
+                                                        Foreground="White"
+                                                        Padding="10,5"
+                                                        Margin="0,0,0,5"
+                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                                <Button Content="🗑 Delete" 
+                                                        Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#F44336"
+                                                        Foreground="White"
+                                                        Padding="10,5"
+                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
 

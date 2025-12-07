@@ -177,6 +177,12 @@ public partial class SubjectListViewModel : ViewModelBase, INavigationAware
     }
 
     [RelayCommand]
+    private void ViewFiles(Subject subject)
+    {
+        _navigationService.NavigateTo<SubjectDetailsViewModel>(subject.Id);
+    }
+
+    [RelayCommand]
     private void ViewTasks(Subject subject)
     {
         _navigationService.NavigateTo<TaskListViewModel>(new { TeamId, SubjectId = subject.Id });

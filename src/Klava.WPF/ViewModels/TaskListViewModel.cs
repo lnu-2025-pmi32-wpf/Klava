@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Klava.Application.DTOs;
 using Klava.Application.Services.Interfaces;
 using Klava.Domain.Entities;
+using Klava.Domain.Enums;
 using Klava.WPF.Services;
 using System.Collections.ObjectModel;
 using TaskAsync = System.Threading.Tasks.Task;
@@ -15,6 +17,7 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
     private readonly ISubjectService _subjectService;
     private readonly ITeamService _teamService;
     private readonly IMemberService _memberService;
+    private readonly ISubmissionService _submissionService;
     private readonly SessionService _sessionService;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
@@ -32,7 +35,10 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
     private Subject? _subject;
 
     [ObservableProperty]
-    private ObservableCollection<TaskEntity> _tasks = new();
+    private ObservableCollection<TaskWithUserStatusDto> _todoTasks = new();
+
+    [ObservableProperty]
+    private ObservableCollection<TaskWithUserStatusDto> _doneTasks = new();
 
     [ObservableProperty]
     private ObservableCollection<Subject> _availableSubjects = new();
@@ -69,6 +75,7 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
         ISubjectService subjectService,
         ITeamService teamService,
         IMemberService memberService,
+        ISubmissionService submissionService,
         SessionService sessionService,
         IDialogService dialogService,
         INavigationService navigationService)
@@ -77,6 +84,7 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
         _subjectService = subjectService;
         _teamService = teamService;
         _memberService = memberService;
+        _submissionService = submissionService;
         _sessionService = sessionService;
         _dialogService = dialogService;
         _navigationService = navigationService;
@@ -127,21 +135,39 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
             if (SubjectId.HasValue)
             {
                 Subject = await _subjectService.GetSubjectByIdAsync(SubjectId.Value);
-                var tasksList = await _taskService.GetTasksBySubjectAsync(SubjectId.Value);
-                Tasks.Clear();
-                foreach (var task in tasksList)
-                {
-                    Tasks.Add(task);
-                }
             }
-            else
+
+            // Get all tasks with user's status
+            var allTasks = await _submissionService.GetTeamTasksWithStatusAsync(TeamId, _sessionService.CurrentUser.Id);
+            
+            // Filter by subject if specified
+            if (SubjectId.HasValue)
             {
-                var tasksList = await _taskService.GetTasksByTeamAsync(TeamId);
-                Tasks.Clear();
-                foreach (var task in tasksList)
-                {
-                    Tasks.Add(task);
-                }
+                allTasks = allTasks.Where(t => t.SubjectId == SubjectId.Value).ToList();
+            }
+
+            // Split into todo and done
+            TodoTasks.Clear();
+            DoneTasks.Clear();
+
+            var todoList = allTasks
+                .Where(t => t.CurrentUserStatus == null || t.CurrentUserStatus == SubmissionStatus.Wait)
+                .OrderBy(t => t.Deadline)
+                .ToList();
+
+            var doneList = allTasks
+                .Where(t => t.CurrentUserStatus == SubmissionStatus.Done)
+                .OrderByDescending(t => t.SubmittedAt)
+                .ToList();
+
+            foreach (var task in todoList)
+            {
+                TodoTasks.Add(task);
+            }
+
+            foreach (var task in doneList)
+            {
+                DoneTasks.Add(task);
             }
 
             var subjects = await _subjectService.GetSubjectsByTeamAsync(TeamId);
@@ -173,9 +199,16 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
     }
 
     [RelayCommand]
-    private void ShowEditTask(TaskEntity task)
+    private void ShowEditTask(TaskWithUserStatusDto task)
     {
-        EditingTask = task;
+        EditingTask = new TaskEntity
+        {
+            Id = task.Id,
+            SubjectId = task.SubjectId,
+            Name = task.Name,
+            Description = task.Description,
+            Deadline = task.Deadline
+        };
         NewTaskName = task.Name;
         NewTaskDescription = task.Description ?? string.Empty;
         NewTaskDeadline = task.Deadline;
@@ -229,7 +262,7 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
     }
 
     [RelayCommand]
-    private async TaskAsync DeleteTaskAsync(TaskEntity task)
+    private async TaskAsync DeleteTaskAsync(TaskWithUserStatusDto task)
     {
         var confirmed = _dialogService.ShowConfirmation(
             $"Delete task '{task.Name}'?",
@@ -254,6 +287,23 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
         catch (Exception ex)
         {
             _dialogService.ShowMessage($"Error: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async TaskAsync ToggleTaskStatusAsync(TaskWithUserStatusDto task)
+    {
+        if (_sessionService.CurrentUser == null)
+            return;
+
+        try
+        {
+            await _submissionService.ToggleStatusAsync(task.Id, _sessionService.CurrentUser.Id);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowError($"Error updating task status: {ex.Message}", "Error");
         }
     }
 
