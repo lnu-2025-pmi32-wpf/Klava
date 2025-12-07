@@ -16,4 +16,5 @@ public class Subject
     
     public Team Team { get; set; } = null!;
     public ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public ICollection<SubjectFile> Files { get; set; } = new List<SubjectFile>();
 }

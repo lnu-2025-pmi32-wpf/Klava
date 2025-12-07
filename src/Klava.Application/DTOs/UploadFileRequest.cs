@@ -1,0 +1,10 @@
+namespace Klava.Application.DTOs;
+
+public class UploadFileRequest
+{
+    public int SubjectId { get; set; }
+    public string FileName { get; set; } = string.Empty;
+    public string ContentType { get; set; } = string.Empty;
+    public long Size { get; set; }
+    public Stream FileStream { get; set; } = null!;
+}

@@ -114,9 +114,14 @@
                                                     @subject.Status
                                                 </span>
                                             </div>
-                                            <a href="/tasks?teamId=@TeamId&subjectId=@subject.Id" class="btn btn-sm btn-outline-primary">
-                                                Tasks
-                                            </a>
+                                            <div>
+                                                <a href="/subjects/@subject.Id" class="btn btn-sm btn-outline-primary">
+                                                    <span class="bi bi-folder"></span> Details
+                                                </a>
+                                                <a href="/tasks?teamId=@TeamId&subjectId=@subject.Id" class="btn btn-sm btn-outline-secondary ms-1">
+                                                    <span class="bi bi-list-task"></span> Tasks
+                                                </a>
+                                            </div>
                                         </div>
                                         @if (!string.IsNullOrEmpty(subject.SubjectInfo))
                                         {
