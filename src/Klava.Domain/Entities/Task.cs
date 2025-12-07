@@ -12,5 +12,7 @@ public class Task
     
     public DateTime? Deadline { get; set; }
     
+    // Navigation properties
     public Subject Subject { get; set; } = null!;
+    public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }
