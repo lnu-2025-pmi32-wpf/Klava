@@ -39,7 +39,6 @@ public class SubjectFileConfiguration : IEntityTypeConfiguration<SubjectFile>
         builder.Property(e => e.UploadedAt)
             .HasColumnName("uploaded_at");
         
-        // Relationship: SubjectFile -> Subject
         builder.HasOne(e => e.Subject)
             .WithMany(s => s.Files)
             .HasForeignKey(e => e.SubjectId)

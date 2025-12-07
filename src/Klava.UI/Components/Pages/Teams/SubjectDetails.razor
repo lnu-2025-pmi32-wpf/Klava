@@ -45,7 +45,6 @@
             </div>
         }
 
-        <!-- Tabs -->
         <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
                 <a class="nav-link @(activeTab == "tasks" ? "active" : "")" 
@@ -63,7 +62,6 @@
             </li>
         </ul>
 
-        <!-- Tab Content -->
         @if (activeTab == "tasks")
         {
             <div class="card">
@@ -208,10 +206,10 @@
 
         try
         {
-            var maxFileSize = 10 * 1024 * 1024; // 10 MB
+            var maxFileSize = 10 * 1024 * 1024;
             var uploadedCount = 0;
 
-            foreach (var file in e.GetMultipleFiles(10)) // Max 10 files at once
+            foreach (var file in e.GetMultipleFiles(10))
             {
                 try
                 {

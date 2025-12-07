@@ -16,6 +16,5 @@ public class SubjectFile
     
     public DateTime UploadedAt { get; set; }
     
-    // Navigation property
     public Subject Subject { get; set; } = null!;
 }
