@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Enable legacy timestamp behavior for Npgsql
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

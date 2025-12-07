@@ -76,7 +76,18 @@
                                FontWeight="Bold"
                                Margin="0,0,0,20"/>
 
-                    <Button Content="View Tasks" 
+                    <Button Content="View Subjects" 
+                            Command="{Binding ViewSubjectsCommand}"
+                            Padding="15,12"
+                            Background="#2196F3"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="14"
+                            Margin="0,0,0,10"
+                            HorizontalAlignment="Stretch"
+                            Cursor="Hand"/>
+
+                    <Button Content="View All Tasks" 
                             Command="{Binding ViewTasksCommand}"
                             Padding="15,12"
                             Background="#2196F3"

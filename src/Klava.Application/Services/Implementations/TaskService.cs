@@ -40,6 +40,7 @@ public class TaskService : ITaskService
     public async Task<List<Klava.Domain.Entities.Task>> GetTasksBySubjectAsync(int subjectId)
     {
         return await _context.Tasks
+            .Include(t => t.Subject)
             .Where(t => t.SubjectId == subjectId)
             .OrderBy(t => t.Deadline)
             .ToListAsync();

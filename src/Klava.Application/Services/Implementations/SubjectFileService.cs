@@ -22,7 +22,11 @@ public class SubjectFileService : ISubjectFileService
     {
         try
         {
-            var storageName = await _fileStorage.SaveFileAsync(request.FileStream, request.FileName);
+            // Save file in subject-specific folder
+            var storageName = await _fileStorage.SaveFileAsync(
+                request.FileStream, 
+                request.FileName, 
+                request.SubjectId);
 
             var subjectFile = new SubjectFile
             {
@@ -67,7 +71,8 @@ public class SubjectFileService : ISubjectFileService
         if (file == null)
             return null;
 
-        return await _fileStorage.GetFileAsync(file.StorageName);
+        // Get file from subject-specific folder
+        return await _fileStorage.GetFileAsync(file.StorageName, file.SubjectId);
     }
 
     public async Task<bool> DeleteFileAsync(int fileId)
@@ -77,7 +82,8 @@ public class SubjectFileService : ISubjectFileService
         if (file == null)
             return false;
 
-        var fileDeleted = await _fileStorage.DeleteFileAsync(file.StorageName);
+        // Delete file from subject-specific folder
+        var fileDeleted = await _fileStorage.DeleteFileAsync(file.StorageName, file.SubjectId);
         
         if (!fileDeleted)
             return false;

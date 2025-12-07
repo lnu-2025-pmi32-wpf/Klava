@@ -98,15 +98,19 @@ public partial class TeamDashboardViewModel : ViewModelBase, INavigationAware
             return;
         }
 
-        // This will be implemented in later phases
-        _dialogService.ShowMessage("Member management will be available in the next phase.", "Coming Soon");
+        _navigationService.NavigateTo<ManageMembersViewModel>(_teamId);
+    }
+
+    [RelayCommand]
+    private void ViewSubjects()
+    {
+        _navigationService.NavigateTo<SubjectListViewModel>(_teamId);
     }
 
     [RelayCommand]
     private void ViewTasks()
     {
-        // This will be implemented in later phases
-        _dialogService.ShowMessage("Task management will be available in the next phase.", "Coming Soon");
+        _navigationService.NavigateTo<TaskListViewModel>(_teamId);
     }
 
     [RelayCommand]
