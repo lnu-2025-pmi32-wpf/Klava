@@ -13,12 +13,4 @@ public partial class RegisterView : UserControl
     {
         InitializeComponent();
     }
-
-    private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is RegisterViewModel viewModel)
-        {
-            viewModel.Password = PasswordBox.Password;
-        }
-    }
 }
