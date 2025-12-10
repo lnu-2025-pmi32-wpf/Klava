@@ -37,6 +37,17 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
     [ObservableProperty]
     private ObservableCollection<TaskWithUserStatusDto> _todoTasks = new();
 
+    public List<DateTime> Deadlines => TodoTasks
+        .Where(t => t.Deadline.HasValue)
+        .Select(t => t.Deadline.Value.Date)
+        .Distinct()
+        .ToList();
+
+    partial void OnTodoTasksChanged(ObservableCollection<TaskWithUserStatusDto> value)
+    {
+        OnPropertyChanged(nameof(Deadlines));
+    }
+
     [ObservableProperty]
     private ObservableCollection<TaskWithUserStatusDto> _doneTasks = new();
 
@@ -173,6 +184,8 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
             {
                 AvailableSubjects.Add(subj);
             }
+            
+            OnPropertyChanged(nameof(Deadlines));
         }
         catch (Exception ex)
         {
