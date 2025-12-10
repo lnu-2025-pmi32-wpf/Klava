@@ -1,7 +1,8 @@
 <UserControl x:Class="Klava.WPF.Views.ManageMembersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="clr-namespace:Klava.WPF.Converters">
+             xmlns:converters="clr-namespace:Klava.WPF.Converters"
+             xmlns:controls="clr-namespace:Klava.WPF.Controls">
     <UserControl.Resources>
         <converters:NullToVisibilityConverter x:Key="NullToVisibility"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -38,14 +39,7 @@
                 BorderThickness="1" 
                 Background="White">
             <Grid>
-                <StackPanel HorizontalAlignment="Center" 
-                            VerticalAlignment="Center"
-                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
-                    <ProgressBar IsIndeterminate="True" Width="200" Height="20"/>
-                    <TextBlock Text="Loading members..." 
-                               Margin="0,10,0,0" 
-                               HorizontalAlignment="Center"/>
-                </StackPanel>
+                <controls:LoadingOverlay IsVisible="{Binding IsLoading}" />
 
                 <DataGrid ItemsSource="{Binding Members}"
                           AutoGenerateColumns="False"
