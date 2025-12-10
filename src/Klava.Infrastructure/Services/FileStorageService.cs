@@ -18,7 +18,6 @@ public class FileStorageService : IFileStorageService
 
     public async Task<string> SaveFileAsync(Stream fileStream, string fileName, int? subjectId = null)
     {
-        // Create subject-specific folder if subjectId is provided
         var targetPath = _storagePath;
         if (subjectId.HasValue)
         {
@@ -29,9 +28,8 @@ public class FileStorageService : IFileStorageService
             }
         }
 
-        // Generate unique filename with timestamp and GUID
         var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-        var guid = Guid.NewGuid().ToString("N")[..8]; // First 8 chars of GUID
+        var guid = Guid.NewGuid().ToString("N")[..8]; 
         var extension = Path.GetExtension(fileName);
         var storageName = $"{timestamp}_{guid}{extension}";
         
@@ -47,7 +45,6 @@ public class FileStorageService : IFileStorageService
 
     public async Task<Stream?> GetFileAsync(string storageName, int? subjectId = null)
     {
-        // Try subject-specific folder first if subjectId is provided
         string? filePath = null;
         
         if (subjectId.HasValue)
@@ -55,7 +52,6 @@ public class FileStorageService : IFileStorageService
             filePath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}", storageName);
         }
         
-        // Fallback to root storage path
         if (filePath == null || !File.Exists(filePath))
         {
             filePath = Path.Combine(_storagePath, storageName);
@@ -78,7 +74,6 @@ public class FileStorageService : IFileStorageService
 
     public Task<bool> DeleteFileAsync(string storageName, int? subjectId = null)
     {
-        // Try subject-specific folder first if subjectId is provided
         string? filePath = null;
         
         if (subjectId.HasValue)
@@ -86,7 +81,6 @@ public class FileStorageService : IFileStorageService
             filePath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}", storageName);
         }
         
-        // Fallback to root storage path
         if (filePath == null || !File.Exists(filePath))
         {
             filePath = Path.Combine(_storagePath, storageName);
@@ -110,7 +104,6 @@ public class FileStorageService : IFileStorageService
 
     public Task<bool> FileExistsAsync(string storageName, int? subjectId = null)
     {
-        // Try subject-specific folder first if subjectId is provided
         string? filePath = null;
         
         if (subjectId.HasValue)
@@ -118,7 +111,6 @@ public class FileStorageService : IFileStorageService
             filePath = Path.Combine(_storagePath, "subjects", $"subject_{subjectId.Value}", storageName);
         }
         
-        // Fallback to root storage path
         if (filePath == null || !File.Exists(filePath))
         {
             filePath = Path.Combine(_storagePath, storageName);

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Klava.Application.Services.Implementations;
 using Klava.Application.DTOs;
@@ -23,7 +24,8 @@ public class SubjectFileServiceTests : IDisposable
             .Options;
         _context = new AppDbContext(options);
         _mockFileStorage = new Mock<IFileStorageService>();
-        _subjectFileService = new SubjectFileService(_context, _mockFileStorage.Object);
+        var mockLogger = new Mock<ILogger<SubjectFileService>>();
+        _subjectFileService = new SubjectFileService(_context, _mockFileStorage.Object, mockLogger.Object);
     }
 
     public void Dispose()

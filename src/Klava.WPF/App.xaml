@@ -4,7 +4,6 @@
              xmlns:local="clr-namespace:Klava.WPF"
              xmlns:converters="clr-namespace:Klava.WPF.Converters">
     <Application.Resources>
-        <!-- Converters -->
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>

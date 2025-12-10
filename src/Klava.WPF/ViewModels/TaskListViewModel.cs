@@ -137,16 +137,13 @@ public partial class TaskListViewModel : ViewModelBase, INavigationAware
                 Subject = await _subjectService.GetSubjectByIdAsync(SubjectId.Value);
             }
 
-            // Get all tasks with user's status
             var allTasks = await _submissionService.GetTeamTasksWithStatusAsync(TeamId, _sessionService.CurrentUser.Id);
             
-            // Filter by subject if specified
             if (SubjectId.HasValue)
             {
                 allTasks = allTasks.Where(t => t.SubjectId == SubjectId.Value).ToList();
             }
 
-            // Split into todo and done
             TodoTasks.Clear();
             DoneTasks.Clear();
 

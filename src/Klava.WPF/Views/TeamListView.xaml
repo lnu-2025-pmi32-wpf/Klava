@@ -13,7 +13,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
             <TextBlock Text="My Teams" 
                        FontSize="28" 
@@ -29,7 +28,6 @@
                     Cursor="Hand"/>
         </StackPanel>
 
-        <!-- Action Buttons -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
             <Button Content="Create New Team" 
                     Command="{Binding CreateTeamCommand}"
@@ -48,14 +46,12 @@
                     Cursor="Hand"/>
         </StackPanel>
 
-        <!-- Teams List -->
         <Border Grid.Row="2" 
                 BorderBrush="#e0e0e0" 
                 BorderThickness="1"
                 CornerRadius="4"
                 Background="White">
             <Grid>
-                <!-- Loading Indicator -->
                 <TextBlock Text="Loading teams..." 
                            FontSize="16"
                            Foreground="#666"
@@ -63,7 +59,6 @@
                            VerticalAlignment="Center"
                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <!-- Teams ListView -->
                 <ListView ItemsSource="{Binding Teams}"
                           BorderThickness="0">
                     <ListView.View>
@@ -107,7 +102,6 @@
             </Grid>
         </Border>
 
-        <!-- Join Team Dialog Overlay -->
         <Border Grid.RowSpan="3" 
                 Background="#80000000"
                 Visibility="{Binding ShowJoinDialog, Converter={StaticResource BoolToVisibilityConverter}}">
