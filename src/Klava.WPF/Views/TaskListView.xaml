@@ -1,7 +1,9 @@
 <UserControl x:Class="Klava.WPF.Views.TaskListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="clr-namespace:Klava.WPF.Converters">
+             xmlns:converters="clr-namespace:Klava.WPF.Converters"
+             MinWidth="760" MinHeight="480"
+             Background="{StaticResource BackgroundBrush}">
     <UserControl.Resources>
         <converters:NullToVisibilityConverter x:Key="NullToVisibility"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -20,10 +22,10 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="{Binding Subject.Title, StringFormat='Tasks - {0}', FallbackValue='All Tasks'}" 
+            <TextBlock Text="{Binding Subject.Title, StringFormat='Завдання - {0}', FallbackValue='Всі завдання'}" 
                        FontSize="24" 
                        FontWeight="Bold"/>
-            <TextBlock Text="{Binding Team.Name, StringFormat='Team: {0}'}" 
+            <TextBlock Text="{Binding Team.Name, StringFormat='Команда: {0}'}" 
                        FontSize="14" 
                        Foreground="#757575" 
                        Margin="0,5,0,0"/>
@@ -45,7 +47,7 @@
                     Orientation="Horizontal" 
                     Margin="0,0,0,10"
                     Visibility="{Binding IsHeadman, Converter={StaticResource BoolToVisibility}}">
-            <Button Content="Create New Task" 
+            <Button Content="Створити нове завдання" 
                     Command="{Binding ShowCreateTaskCommand}"
                     Background="#2196F3"
                     Foreground="White"
@@ -62,7 +64,7 @@
                             Margin="0,40,0,0"
                             Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
                     <ProgressBar IsIndeterminate="True" Width="200" Height="20"/>
-                    <TextBlock Text="Loading tasks..." 
+                    <TextBlock Text="Завантаження завдань..." 
                                Margin="0,10,0,0" 
                                HorizontalAlignment="Center"/>
                 </StackPanel>
@@ -78,7 +80,7 @@
                         <TextBlock FontSize="20" 
                                    FontWeight="Bold" 
                                    Margin="0,0,0,15">
-                            <Run Text="⏰ To Do ("/>
+                            <Run Text="Невідкладні ("/>
                             <Run Text="{Binding TodoTasks.Count, Mode=OneWay}"/>
                             <Run Text=")"/>
                         </TextBlock>
@@ -108,15 +110,15 @@
                                                            Margin="0,0,0,5"
                                                            Visibility="{Binding Description, Converter={StaticResource NullToVisibility}}"/>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="📚 Subject: " 
-                                                               FontWeight="Bold" 
-                                                               Margin="0,0,5,0"/>
+                                                    <TextBlock Text="Предмет: " 
+                                                                   FontWeight="Bold" 
+                                                                   Margin="0,0,5,0"/>
                                                     <TextBlock Text="{Binding SubjectTitle}"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" 
                                                             Margin="0,5,0,0"
                                                             Visibility="{Binding Deadline, Converter={StaticResource NullToVisibility}}">
-                                                    <TextBlock Text="📅 Deadline: " 
+                                                    <TextBlock Text="Дедлайн: " 
                                                                FontWeight="Bold" 
                                                                Margin="0,0,5,0"/>
                                                     <TextBlock Text="{Binding Deadline, StringFormat='MMM dd, yyyy HH:mm'}"/>
@@ -126,28 +128,31 @@
                                             <StackPanel Grid.Column="1" 
                                                         Orientation="Vertical" 
                                                         VerticalAlignment="Center">
-                                                <Button Content="✓ Mark Done" 
-                                                        Command="{Binding DataContext.ToggleTaskStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}"
-                                                        Background="#4CAF50"
-                                                        Foreground="White"
-                                                        Padding="10,5"
-                                                        Margin="0,0,0,5"/>
-                                                <Button Content="✏ Edit" 
-                                                        Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}"
-                                                        Background="#FF9800"
-                                                        Foreground="White"
-                                                        Padding="10,5"
-                                                        Margin="0,0,0,5"
-                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
-                                                <Button Content="🗑 Delete" 
-                                                        Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}"
-                                                        Background="#F44336"
-                                                        Foreground="White"
-                                                        Padding="10,5"
-                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                                <Button Content="Позначити готовим" 
+                                                    Command="{Binding DataContext.ToggleTaskStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#4CAF50"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    Margin="0,0,0,5"
+                                                    Style="{StaticResource ModernButton}"/>
+                                                <Button Content="Редагувати" 
+                                                    Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#FF9800"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    Margin="0,0,0,5"
+                                                    Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                                                    Style="{StaticResource ModernButton}"/>
+                                                <Button Content="Видалити" 
+                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#F44336"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                                                    Style="{StaticResource ModernButton}"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -168,7 +173,7 @@
                         <TextBlock FontSize="20" 
                                    FontWeight="Bold" 
                                    Margin="0,0,0,15">
-                            <Run Text="✓ Done ("/>
+                            <Run Text="Завершено ("/>
                             <Run Text="{Binding DoneTasks.Count, Mode=OneWay}"/>
                             <Run Text=")"/>
                         </TextBlock>
@@ -203,17 +208,17 @@
                                                            Foreground="#757575"
                                                            Visibility="{Binding Description, Converter={StaticResource NullToVisibility}}"/>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="📚 Subject: " 
-                                                               FontWeight="Bold" 
-                                                               Margin="0,0,5,0"
-                                                               Foreground="#757575"/>
+                                                    <TextBlock Text="Предмет: " 
+                                                                   FontWeight="Bold" 
+                                                                   Margin="0,0,5,0"
+                                                                   Foreground="#757575"/>
                                                     <TextBlock Text="{Binding SubjectTitle}"
                                                                Foreground="#757575"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" 
                                                             Margin="0,5,0,0"
                                                             Visibility="{Binding SubmittedAt, Converter={StaticResource NullToVisibility}}">
-                                                    <TextBlock Text="✓ Completed: " 
+                                                    <TextBlock Text="Завершено: " 
                                                                FontWeight="Bold" 
                                                                Margin="0,0,5,0"
                                                                Foreground="#4CAF50"/>
@@ -225,28 +230,31 @@
                                             <StackPanel Grid.Column="1" 
                                                         Orientation="Vertical" 
                                                         VerticalAlignment="Center">
-                                                <Button Content="↶ Mark Undone" 
-                                                        Command="{Binding DataContext.ToggleTaskStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}"
-                                                        Background="#FF9800"
-                                                        Foreground="White"
-                                                        Padding="10,5"
-                                                        Margin="0,0,0,5"/>
-                                                <Button Content="✏ Edit" 
-                                                        Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}"
-                                                        Background="#757575"
-                                                        Foreground="White"
-                                                        Padding="10,5"
-                                                        Margin="0,0,0,5"
-                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
-                                                <Button Content="🗑 Delete" 
-                                                        Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}"
-                                                        Background="#F44336"
-                                                        Foreground="White"
-                                                        Padding="10,5"
-                                                        Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                                <Button Content="Повернути в невідкладні" 
+                                                    Command="{Binding DataContext.ToggleTaskStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#FF9800"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    Margin="0,0,0,5"
+                                                    Style="{StaticResource ModernButton}"/>
+                                                <Button Content="Редагувати" 
+                                                    Command="{Binding DataContext.ShowEditTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#757575"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    Margin="0,0,0,5"
+                                                    Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                                                    Style="{StaticResource ModernButton}"/>
+                                                <Button Content="Видалити" 
+                                                    Command="{Binding DataContext.DeleteTaskCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#F44336"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    Visibility="{Binding DataContext.IsHeadman, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                                                    Style="{StaticResource ModernButton}"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -262,12 +270,16 @@
         <StackPanel Grid.Row="4" 
                     Orientation="Horizontal" 
                     Margin="0,20,0,0">
-            <Button Content="Back" 
+                <Button Content="‹" 
                     Command="{Binding GoBackCommand}"
-                    Background="#757575"
-                    Foreground="White"
-                    Padding="15,8"
-                    FontSize="14"/>
+                    Background="Transparent"
+                    Foreground="{StaticResource PrimaryBrush}"
+                    Padding="6,4"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    ToolTip="Повернутись"/>
         </StackPanel>
 
         <!-- Create/Edit Task Dialog Overlay -->
@@ -284,12 +296,12 @@
                     <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
                 </Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="{Binding EditingTask, Converter={StaticResource TaskDialogTitleConverter}, FallbackValue='Create New Task'}" 
+                    <TextBlock Text="{Binding EditingTask, Converter={StaticResource TaskDialogTitleConverter}, FallbackValue='Створити нове завдання'}" 
                                FontSize="18" 
                                FontWeight="Bold" 
                                Margin="0,0,0,15"/>
 
-                    <TextBlock Text="Subject:" Margin="0,0,0,5"/>
+                    <TextBlock Text="Предмет:" Margin="0,0,0,5"/>
                     <ComboBox ItemsSource="{Binding AvailableSubjects}"
                               SelectedValue="{Binding NewTaskSubjectId}"
                               SelectedValuePath="Id"
@@ -297,12 +309,12 @@
                               Padding="8" 
                               Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Task Name:" Margin="0,0,0,5"/>
+                    <TextBlock Text="Назва завдання:" Margin="0,0,0,5"/>
                     <TextBox Text="{Binding NewTaskName, UpdateSourceTrigger=PropertyChanged}" 
                              Padding="8" 
                              Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Description (optional):" Margin="0,0,0,5"/>
+                    <TextBlock Text="Опис (необов'язково):" Margin="0,0,0,5"/>
                     <TextBox Text="{Binding NewTaskDescription, UpdateSourceTrigger=PropertyChanged}" 
                              Padding="8" 
                              Height="100" 
@@ -310,23 +322,25 @@
                              AcceptsReturn="True" 
                              Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Deadline (optional):" Margin="0,0,0,5"/>
+                    <TextBlock Text="Дедлайн (необов'язково):" Margin="0,0,0,5"/>
                     <DatePicker SelectedDate="{Binding NewTaskDeadline}" 
                                 Padding="8" 
                                 Margin="0,0,0,20"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Cancel" 
-                                Command="{Binding CancelTaskDialogCommand}"
-                                Background="#757575"
-                                Foreground="White"
-                                Padding="15,8"
-                                Margin="0,0,10,0"/>
-                        <Button Content="{Binding EditingTask, Converter={StaticResource TaskDialogButtonConverter}, FallbackValue='Create'}" 
-                                Command="{Binding SaveTaskCommand}"
-                                Background="#2196F3"
-                                Foreground="White"
-                                Padding="15,8"/>
+                        <Button Content="Скасувати" 
+                            Command="{Binding CancelTaskDialogCommand}"
+                            Background="#757575"
+                            Foreground="White"
+                            Padding="12,8"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource ModernButton}"/>
+                        <Button Content="{Binding EditingTask, Converter={StaticResource TaskDialogButtonConverter}, FallbackValue='Створити'}" 
+                            Command="{Binding SaveTaskCommand}"
+                            Background="#2196F3"
+                            Foreground="White"
+                            Padding="12,8"
+                            Style="{StaticResource ModernButton}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

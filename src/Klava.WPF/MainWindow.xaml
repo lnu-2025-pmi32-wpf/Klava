@@ -8,8 +8,10 @@
         xmlns:views="clr-namespace:Klava.WPF.Views"
         xmlns:converters="clr-namespace:Klava.WPF.Converters"
         mc:Ignorable="d"
-        Title="Klava - Student Task Management" Height="600" Width="900"
-        WindowStartupLocation="CenterScreen">
+        Title="Klava - Student Task Management" Height="720" Width="1200" MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        TextOptions.TextFormattingMode="Display">
     
     <Window.Resources>
         <!-- Converters -->
@@ -47,49 +49,59 @@
         </DataTemplate>
     </Window.Resources>
     
-    <Grid>
+    <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#2196F3" Padding="10">
+        <!-- Header with Gradient -->
+        <Border Grid.Row="0" CornerRadius="0,0,8,8">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="{StaticResource PrimaryColor}" Offset="0"/>
+                    <GradientStop Color="{StaticResource PrimaryDarkColor}" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
             <Grid>
-                <TextBlock Text="Klava - Student Task Management" 
-                           FontSize="20" 
-                           FontWeight="Bold" 
-                           Foreground="White"
-                           VerticalAlignment="Center"/>
-                <StackPanel Orientation="Horizontal" 
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center">
-                    <TextBlock Text="{Binding CurrentUserName}" 
-                               Foreground="White" 
-                               FontSize="14"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0"/>
-                    <TextBlock Text="●" 
-                               Foreground="LightGreen" 
-                               FontSize="16"
-                               VerticalAlignment="Center"
-                               Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Logo and Title -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0" Margin="24,16,0,16">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Klava" FontSize="26" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Task Management System" FontSize="12" Foreground="#E8EAF6" Opacity="0.8" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- User Info -->
+                <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,16,24,16">
+                    <TextBlock Text="{Binding CurrentUserName}" Foreground="White" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <Border Width="12" Height="12" Background="#4CAF50" CornerRadius="6" VerticalAlignment="Center" Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- Content Area -->
-        <ContentControl Grid.Row="1" 
-                        Content="{Binding CurrentViewModel}"
-                        Margin="10"/>
+        <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>
 
         <!-- Footer -->
-        <Border Grid.Row="2" Background="#f5f5f5" Padding="10" BorderThickness="0,1,0,0" BorderBrush="#e0e0e0">
-            <TextBlock Text="2025 Klava - Phase 1: Infrastructure and Basic Auth" 
-                       FontSize="12" 
-                       Foreground="#666"
-                       HorizontalAlignment="Center"/>
+        <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+            <Grid Margin="24,12,24,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="© 2025 Klava - Student Task Management System" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Grid.Column="0"/>
+                <TextBlock Text="Phase 1: Infrastructure and Basic Auth" FontSize="11" Foreground="#BDBDBD" Grid.Column="1"/>
+            </Grid>
         </Border>
     </Grid>
 </Window>

@@ -5,102 +5,120 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Klava.WPF.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="900"
+             MinWidth="520" MinHeight="420"
+             Background="{StaticResource BackgroundBrush}">
     <Grid>
-        <Border MaxWidth="400" 
-                VerticalAlignment="Center"
-                Background="White"
-                BorderBrush="#e0e0e0"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="30">
+        <Border MaxWidth="420" 
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="40">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="10" 
-                                  ShadowDepth="2" 
-                                  Opacity="0.2" 
+                <DropShadowEffect BlurRadius="15" 
+                                  ShadowDepth="3" 
+                                  Opacity="0.15" 
                                   Color="Black"/>
             </Border.Effect>
             
             <StackPanel>
-                <TextBlock Text="Login" 
-                           FontSize="28" 
-                           FontWeight="Bold" 
-                           Margin="0,0,0,30"
-                           HorizontalAlignment="Center"/>
+                <!-- Header -->
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <TextBlock Text="Ласкаво просимо" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Увійдіть у ваш акаунт" 
+                               FontSize="13" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,6,0,0"/>
+                </StackPanel>
 
-                <TextBlock Text="First Name:" 
-                           Margin="0,0,0,5"/>
+                <!-- First Name -->
+                <TextBlock Text="Ім'я" 
+                           Margin="0,0,0,8"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontWeight="SemiBold"
+                           FontSize="12"/>
                 <TextBox Text="{Binding Firstname, UpdateSourceTrigger=PropertyChanged}" 
-                         Padding="8"
-                         FontSize="14"
-                         Margin="0,0,0,15"/>
+                         Style="{StaticResource ModernTextBox}"
+                         Margin="0,0,0,16"
+                         Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                <TextBlock Text="Last Name:" 
-                           Margin="0,0,0,5"/>
+                <!-- Last Name -->
+                <TextBlock Text="Прізвище" 
+                           Margin="0,0,0,8"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontWeight="SemiBold"
+                           FontSize="12"/>
                 <TextBox Text="{Binding Lastname, UpdateSourceTrigger=PropertyChanged}" 
-                         Padding="8"
-                         FontSize="14"
-                         Margin="0,0,0,15"/>
+                         Style="{StaticResource ModernTextBox}"
+                         Margin="0,0,0,16"
+                         Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                <TextBlock Text="Password:" 
-                           Margin="0,0,0,5"/>
+                <!-- Password -->
+                <TextBlock Text="Пароль" 
+                           Margin="0,0,0,8"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontWeight="SemiBold"
+                           FontSize="12"/>
                 <PasswordBox x:Name="PasswordBox" 
-                             Padding="8"
-                             FontSize="14"
-                             Margin="0,0,0,15"
+                             Style="{StaticResource ModernPasswordBox}"
+                             Margin="0,0,0,20"
                              PasswordChanged="PasswordBox_PasswordChanged"/>
 
-                <TextBlock Text="{Binding ErrorMessage}" 
-                           Foreground="Red" 
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,15"
-                           Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibilityConverter}}"/>
+                <!-- Error Message -->
+                <Border Background="#FFEBEE" 
+                        CornerRadius="6"
+                        Padding="12"
+                        Margin="0,0,0,20"
+                        Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibilityConverter}}">
+                    <TextBlock Text="{Binding ErrorMessage}" 
+                               Foreground="#C62828" 
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+                </Border>
 
-                <Button Content="Login" 
-                        Command="{Binding LoginCommand}"
-                        Height="40"
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Background="#2196F3"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Margin="0,0,0,15"
-                        Cursor="Hand"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}"
-                                                CornerRadius="4"
-                                                Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter HorizontalAlignment="Center" 
-                                                              VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#1976D2"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Background" Value="#cccccc"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <!-- Login Button -->
+                <Button Content="Увійти" 
+                    Command="{Binding LoginCommand}"
+                    Height="44"
+                    FontSize="15"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource PrimaryButton}"
+                    Margin="0,0,0,16"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"/>
 
-                <Button Content="Don't have an account? Register" 
-                        Command="{Binding NavigateToRegisterCommand}"
-                        Background="Transparent"
-                        Foreground="#2196F3"
-                        BorderThickness="0"
-                        FontSize="14"
-                        Cursor="Hand"
-                        HorizontalAlignment="Center"/>
+                <!-- Loading Indicator -->
+                <TextBlock Text="Вхід у систему..." 
+                           FontSize="14"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           HorizontalAlignment="Center"
+                           Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
+                           Margin="0,0,0,16"/>
+
+                <!-- Register Link -->
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,0">
+                    <TextBlock Text="Немає акаунту? " 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="13"/>
+                    <Button Content="Реєстрація" 
+                            Command="{Binding NavigateToRegisterCommand}"
+                            Background="Transparent"
+                            Foreground="{StaticResource PrimaryBrush}"
+                            BorderThickness="0"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Cursor="Hand"
+                            Padding="2,0"/>
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>
