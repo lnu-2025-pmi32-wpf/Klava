@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Klava.Application.Services.Implementations;
 using Klava.Domain.Entities;
 using Klava.Domain.Enums;
@@ -18,7 +20,8 @@ public class MemberServiceTests : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         _context = new AppDbContext(options);
-        _memberService = new MemberService(_context);
+        var mockLogger = new Mock<ILogger<MemberService>>();
+        _memberService = new MemberService(_context, mockLogger.Object);
     }
 
     public void Dispose()

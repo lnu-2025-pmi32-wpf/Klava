@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Klava.Application.Services.Implementations;
 using Klava.Domain.Entities;
 using Klava.Domain.Enums;
@@ -18,7 +20,8 @@ public class TaskServiceTests : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         _context = new AppDbContext(options);
-        _taskService = new TaskService(_context);
+        var mockLogger = new Mock<ILogger<TaskService>>();
+        _taskService = new TaskService(_context, mockLogger.Object);
     }
 
     public void Dispose()

@@ -138,7 +138,6 @@
                     FontSize="14"/>
         </StackPanel>
 
-        <!-- Create Subject Dialog Overlay -->
         <Border Grid.RowSpan="5" 
                 Background="#80000000" 
                 Visibility="{Binding ShowCreateDialog, Converter={StaticResource BoolToVisibility}}"

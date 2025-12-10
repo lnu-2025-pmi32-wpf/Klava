@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Klava.Application.Services.Implementations;
 using Klava.Domain.Entities;
 using Klava.Infrastructure.Data;
@@ -17,7 +19,8 @@ public class AuthServiceTests : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         _context = new AppDbContext(options);
-        _authService = new AuthService(_context);
+        var mockLogger = new Mock<ILogger<AuthService>>();
+        _authService = new AuthService(_context, mockLogger.Object);
     }
 
     public void Dispose()
