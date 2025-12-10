@@ -14,12 +14,10 @@
         TextOptions.TextFormattingMode="Display">
     
     <Window.Resources>
-        <!-- Converters -->
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
         
-        <!-- DataTemplates for automatic View-ViewModel binding -->
         <DataTemplate DataType="{x:Type vm:LoginViewModel}">
             <views:LoginView />
         </DataTemplate>

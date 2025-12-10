@@ -1,6 +1,7 @@
 namespace Klava.Application.Services.Implementations;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Klava.Application.Services.Interfaces;
 using Klava.Application.DTOs;
 using Klava.Domain.Entities;
@@ -10,20 +11,23 @@ using Klava.Infrastructure.Data;
 public class SubmissionService : ISubmissionService
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<SubmissionService> _logger;
 
-    public SubmissionService(AppDbContext context)
+    public SubmissionService(AppDbContext context, ILogger<SubmissionService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<bool> ToggleStatusAsync(int taskId, int userId)
     {
+        _logger.LogInformation("Toggling submission status for task {TaskId} by user {UserId}", taskId, userId);
+        
         var submission = await _context.Submissions
             .FirstOrDefaultAsync(s => s.TaskId == taskId && s.UserId == userId);
 
         if (submission == null)
         {
-            // Create new submission with Done status
             submission = new Submission
             {
                 TaskId = taskId,
@@ -32,14 +36,16 @@ public class SubmissionService : ISubmissionService
                 SubmittedAt = DateTime.UtcNow
             };
             _context.Submissions.Add(submission);
+            _logger.LogInformation("Created new submission for task {TaskId} by user {UserId} with status Done", taskId, userId);
         }
         else
         {
-            // Toggle between Wait and Done
+            var oldStatus = submission.Status;
             submission.Status = submission.Status == SubmissionStatus.Wait 
                 ? SubmissionStatus.Done 
                 : SubmissionStatus.Wait;
             submission.SubmittedAt = DateTime.UtcNow;
+            _logger.LogInformation("Toggled submission status for task {TaskId} by user {UserId}: {OldStatus} -> {NewStatus}", taskId, userId, oldStatus, submission.Status);
         }
 
         await _context.SaveChangesAsync();

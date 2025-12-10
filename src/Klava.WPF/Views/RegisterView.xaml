@@ -4,11 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Klava.WPF.Views"
+             xmlns:controls="clr-namespace:Klava.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900"
              MinWidth="520" MinHeight="420"
              Background="{StaticResource BackgroundBrush}">
     <Grid>
+        <controls:LoadingOverlay IsVisible="{Binding IsLoading}" />
+
         <Border MaxWidth="420" 
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"

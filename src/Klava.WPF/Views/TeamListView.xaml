@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Klava.WPF.Views"
+             xmlns:controls="clr-namespace:Klava.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900"
              MinWidth="760" MinHeight="480"
@@ -69,7 +69,6 @@
                     Style="{StaticResource ModernButton}"/>
         </StackPanel>
 
-        <!-- Teams List -->
         <Border Grid.Row="2" 
                 Background="{StaticResource SurfaceBrush}"
                 BorderBrush="{StaticResource BorderBrush}" 
@@ -186,7 +185,6 @@
             </Grid>
         </Border>
 
-        <!-- Join Team Dialog Overlay -->
         <Border Grid.RowSpan="3" 
                 Background="#80000000"
                 Visibility="{Binding ShowJoinDialog, Converter={StaticResource BoolToVisibilityConverter}}"

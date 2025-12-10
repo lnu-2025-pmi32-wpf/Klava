@@ -12,8 +12,8 @@ public class StatusToBrushConverter : IValueConverter
         if (value is SubjectStatus status)
         {
             return status == SubjectStatus.Exam 
-                ? new SolidColorBrush(Color.FromRgb(33, 150, 243)) // Blue
-                : new SolidColorBrush(Color.FromRgb(76, 175, 80));  // Green
+                ? new SolidColorBrush(Color.FromRgb(33, 150, 243)) 
+                : new SolidColorBrush(Color.FromRgb(76, 175, 80));  
         }
         return new SolidColorBrush(Colors.Gray);
     }

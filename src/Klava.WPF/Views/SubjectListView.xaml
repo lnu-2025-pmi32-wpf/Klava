@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:Klava.WPF.Converters"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:controls="clr-namespace:Klava.WPF.Controls"
              MinWidth="760" MinHeight="480"
              Background="{StaticResource BackgroundBrush}">
     <UserControl.Resources>
@@ -21,14 +22,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
         <TextBlock Grid.Row="0" 
                    Text="{Binding Team.Name, StringFormat='Предмети - {{0}}'}" 
                    FontSize="24" 
                    FontWeight="Bold" 
                    Margin="0,0,0,20"/>
 
-        <!-- Error Message -->
         <Border Grid.Row="1" 
                 Background="#FFEBEE" 
                 Padding="10" 
@@ -39,7 +38,6 @@
                        TextWrapping="Wrap"/>
         </Border>
 
-        <!-- Action Buttons -->
         <StackPanel Grid.Row="2" 
                     Orientation="Horizontal" 
                     Margin="0,0,0,20"
@@ -52,7 +50,6 @@
                     Style="{StaticResource ModernButton}"/>
         </StackPanel>
 
-        <!-- Subjects List -->
         <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Subjects}">
                 <ItemsControl.ItemTemplate>
@@ -137,7 +134,6 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- Bottom Buttons -->
         <StackPanel Grid.Row="4" 
                 Orientation="Horizontal" 
                 Margin="0,20,0,0">
@@ -153,7 +149,6 @@
                 ToolTip="Повернутись до команди"/>
         </StackPanel>
 
-        <!-- Create Subject Dialog Overlay -->
         <Border Grid.RowSpan="5" 
                 Background="#80000000" 
                 Visibility="{Binding ShowCreateDialog, Converter={StaticResource BoolToVisibility}}"
@@ -213,5 +208,7 @@
                 </StackPanel>
             </Border>
         </Border>
+
+        <controls:LoadingOverlay Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsLoading}" />
     </Grid>
 </UserControl>
