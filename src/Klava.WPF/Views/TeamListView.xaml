@@ -5,88 +5,177 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:Klava.WPF.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="20">
+             d:DesignHeight="600" d:DesignWidth="900"
+             MinWidth="760" MinHeight="480"
+             Background="{StaticResource BackgroundBrush}">
+    <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-            <TextBlock Text="My Teams" 
-                       FontSize="28" 
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"/>
-            <Button Content="Logout" 
-                    Command="{Binding LogoutCommand}"
-                    Margin="15,0,0,0"
-                    Padding="15,8"
-                    Background="#f44336"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Cursor="Hand"/>
-        </StackPanel>
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,28">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
+            <StackPanel VerticalAlignment="Center" Grid.Column="0">
+                <TextBlock Text="Мої команди" 
+                           FontSize="28" 
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                <TextBlock Text="Керуйте та організуйте свої групи" 
+                           FontSize="13" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <Button Content="Вихід" 
+                    Command="{Binding LogoutCommand}"
+                    Padding="12,8"
+                    Background="#FF5252"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Action Buttons -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
-            <Button Content="Create New Team" 
+            <Button Content="Створити команду" 
                     Command="{Binding CreateTeamCommand}"
-                    Padding="15,10"
-                    Background="#2196F3"
+                    Padding="14,10"
+                    Background="{StaticResource PrimaryBrush}"
                     Foreground="White"
                     BorderThickness="0"
-                    Margin="0,0,10,0"
-                    Cursor="Hand"/>
-            <Button Content="Join Team by Code" 
+                    FontWeight="SemiBold"
+                    FontSize="13"
+                    Margin="0,0,12,0"
+                    Cursor="Hand"
+                    Width="160"
+                    Style="{StaticResource ModernButton}"/>
+            <Button Content="Приєднатись" 
                     Command="{Binding OpenJoinDialogCommand}"
-                    Padding="15,10"
-                    Background="#4CAF50"
+                    Padding="14,10"
+                    Background="{StaticResource SuccessBrush}"
                     Foreground="White"
                     BorderThickness="0"
-                    Cursor="Hand"/>
+                    FontWeight="SemiBold"
+                    FontSize="13"
+                    Cursor="Hand"
+                    Width="140"
+                    Style="{StaticResource ModernButton}"/>
         </StackPanel>
 
         <Border Grid.Row="2" 
-                BorderBrush="#e0e0e0" 
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}" 
                 BorderThickness="1"
-                CornerRadius="4"
-                Background="White">
+                CornerRadius="8"
+                Padding="0">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" 
+                                  ShadowDepth="2" 
+                                  Opacity="0.1" 
+                                  Color="Black"/>
+            </Border.Effect>
+            
             <Grid>
-                <controls:LoadingOverlay IsVisible="{Binding IsLoading}" />
+                <!-- Loading Indicator -->
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Завантаження команд..." 
+                               FontSize="18"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="Будь ласка, чекайте..." 
+                               FontSize="12"
+                               Foreground="#BDBDBD"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Teams ListView -->
                 <ListView ItemsSource="{Binding Teams}"
-                          BorderThickness="0">
+                          BorderThickness="0"
+                          Background="Transparent">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="MinHeight" Value="64"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                                        <Border Background="Transparent"
+                                                                BorderBrush="#EEEEEE"
+                                                                BorderThickness="0,0,0,1"
+                                                                Padding="20">
+                                                            <Border.Effect>
+                                                                <DropShadowEffect x:Name="Shadow" 
+                                                                                  BlurRadius="0" 
+                                                                                  ShadowDepth="0" 
+                                                                                  Opacity="0"/>
+                                                            </Border.Effect>
+                                                            <GridViewRowPresenter Content="{TemplateBinding Content}"
+                                                                                  Columns="{Binding View.Columns, RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Team Name" Width="300">
+                            <GridViewColumn Header="" Width="320">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Name}" 
-                                                   FontWeight="Bold"
-                                                   FontSize="14"/>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" 
+                                                       FontWeight="SemiBold"
+                                                       FontSize="15"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxWidth="300"/>
+                                            <TextBlock Text="ID: {Binding Id}" 
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Team Code" Width="150">
+                            <GridViewColumn Header="" Width="140">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Code}" 
-                                                   FontFamily="Consolas"
-                                                   FontSize="14"
-                                                   Foreground="#2196F3"/>
+                                        <Border Background="#F3E5F5" 
+                                                CornerRadius="4"
+                                                Padding="8,4">
+                                            <TextBlock Text="{Binding Code}" 
+                                                       FontFamily="Consolas"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource PrimaryBrush}"/>
+                                        </Border>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Actions" Width="150">
+                            <GridViewColumn Header="" Width="160">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="View Dashboard" 
+                                        <Button Content="Панель керування" 
                                                 Command="{Binding DataContext.ViewTeamCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
                                                 CommandParameter="{Binding}"
-                                                Padding="10,5"
-                                                Background="#2196F3"
+                                                Padding="10,8"
+                                                Background="{StaticResource PrimaryBrush}"
                                                 Foreground="White"
                                                 BorderThickness="0"
-                                                Cursor="Hand"/>
+                                                FontWeight="SemiBold"
+                                                FontSize="12"
+                                                Cursor="Hand"
+                                                Width="140"
+                                                Style="{StaticResource ModernButton}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -98,53 +187,75 @@
 
         <Border Grid.RowSpan="3" 
                 Background="#80000000"
-                Visibility="{Binding ShowJoinDialog, Converter={StaticResource BoolToVisibilityConverter}}">
-            <Border MaxWidth="400" 
-                    MaxHeight="250"
-                    Background="White"
-                    CornerRadius="8"
-                    Padding="30"
+                Visibility="{Binding ShowJoinDialog, Converter={StaticResource BoolToVisibilityConverter}}"
+                MouseDown="Border_MouseDown">
+            <Border MaxWidth="420" 
+                    MaxHeight="280"
+                    Background="{StaticResource SurfaceBrush}"
+                    CornerRadius="12"
+                    Padding="32"
                     VerticalAlignment="Center">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="20" 
-                                      ShadowDepth="0" 
-                                      Opacity="0.3" 
+                                      ShadowDepth="3" 
+                                      Opacity="0.25" 
                                       Color="Black"/>
                 </Border.Effect>
                 
                 <StackPanel>
-                    <TextBlock Text="Join Team" 
-                               FontSize="24" 
+                    <TextBlock Text="Приєднатись до команди" 
+                               FontSize="22" 
                                FontWeight="Bold" 
-                               Margin="0,0,0,20"/>
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Введіть 8-символьний код команди" 
+                               FontSize="13" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="0,0,0,24"/>
 
-                    <TextBlock Text="Enter 8-character team code:" 
-                               Margin="0,0,0,10"/>
+                    <TextBlock Text="Код команди" 
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,0,8"/>
                     <TextBox Text="{Binding JoinCode, UpdateSourceTrigger=PropertyChanged}" 
-                             Padding="10"
+                             Style="{StaticResource ModernTextBox}"
                              FontSize="16"
                              FontFamily="Consolas"
                              MaxLength="8"
                              CharacterCasing="Upper"
-                             Margin="0,0,0,20"/>
+                             Margin="0,0,0,24"
+                             Foreground="{StaticResource TextPrimaryBrush}"/>
 
                     <StackPanel Orientation="Horizontal" 
-                                HorizontalAlignment="Right">
-                        <Button Content="Cancel" 
+                                HorizontalAlignment="Right"
+                                Margin="0,0,0,0">
+                        <Button Content="Скасувати" 
                                 Command="{Binding CloseJoinDialogCommand}"
-                                Padding="20,10"
-                                Background="#cccccc"
-                                Foreground="#333"
+                                Padding="18,10"
+                                Background="#F5F5F5"
+                                Foreground="{StaticResource TextPrimaryBrush}"
                                 BorderThickness="0"
-                                Margin="0,0,10,0"
-                                Cursor="Hand"/>
-                        <Button Content="Join" 
+                                FontWeight="SemiBold"
+                                FontSize="13"
+                                Margin="0,0,12,0"
+                                Cursor="Hand"
+                                Style="{StaticResource ModernButton}"/>
+                        <Button Content="Приєднатись" 
                                 Command="{Binding JoinTeamCommand}"
-                                Padding="20,10"
-                                Background="#4CAF50"
+                                Padding="18,10"
+                                Background="{StaticResource SuccessBrush}"
                                 Foreground="White"
                                 BorderThickness="0"
-                                Cursor="Hand"/>
+                                FontWeight="SemiBold"
+                                FontSize="13"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource ModernButton}">
+                                    <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
